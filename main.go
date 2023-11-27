@@ -1,8 +1,9 @@
 package main
 
 import (
-	"strconv"
-
+	appConfig "github.com/dangduoc08/ecommerce-api/config"
+	global "github.com/dangduoc08/ecommerce-api/globals"
+	"github.com/dangduoc08/ecommerce-api/user"
 	"github.com/dangduoc08/gooh/core"
 	"github.com/dangduoc08/gooh/log"
 	"github.com/dangduoc08/gooh/middlewares"
@@ -13,32 +14,19 @@ func main() {
 	app := core.New()
 	logger := log.NewLog(&log.LogOptions{
 		Level:     log.DebugLevel,
-		LogFormat: log.PrettyFormat,
+		LogFormat: log.TextFormat,
 	})
 
 	app.
 		UseLogger(logger).
-		Use(middlewares.CORS(), middlewares.RequestLogger(logger))
+		Use(middlewares.CORS(), middlewares.RequestLogger(logger)).
+		BindGlobalInterceptors(global.LoggingInterceptor{}, global.ResponseInterceptor{})
 
 	app.Create(
 		core.ModuleBuilder().
 			Imports(
-				config.Register(&config.ConfigModuleOptions{
-					IsGlobal:          true,
-					IsExpandVariables: true,
-					Hooks: []config.ConfigHookFn{
-						func(c config.ConfigService) {
-							port := c.Get("PORT")
-							if s, ok := port.(string); ok {
-								port, err := strconv.Atoi(s)
-								if err != nil {
-									panic(err)
-								}
-								c.Set("PORT", port)
-							}
-						},
-					},
-				}),
+				appConfig.Module,
+				user.Module,
 			).
 			Build(),
 	)
