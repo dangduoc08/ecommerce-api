@@ -30,9 +30,11 @@ var Module = func(
 		sslmode,
 	)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		// Logger: gormLogger.Default.LogMode(gormLogger.Silent),
+	})
 	if err != nil {
-		logger.Fatal("PostgresSQL", "errMsg", err.Error(), "connected", false)
+		logger.Fatal("PostgresSQL", "error", err.Error(), "connected", false)
 	} else {
 		logger.Info("PostgresSQL", "connected", true)
 	}

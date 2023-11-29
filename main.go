@@ -2,7 +2,7 @@ package main
 
 import (
 	appConfig "github.com/dangduoc08/ecommerce-api/config"
-	global "github.com/dangduoc08/ecommerce-api/globals"
+	"github.com/dangduoc08/ecommerce-api/globals"
 	"github.com/dangduoc08/ecommerce-api/user"
 	"github.com/dangduoc08/gooh/core"
 	"github.com/dangduoc08/gooh/log"
@@ -14,13 +14,13 @@ func main() {
 	app := core.New()
 	logger := log.NewLog(&log.LogOptions{
 		Level:     log.DebugLevel,
-		LogFormat: log.TextFormat,
+		LogFormat: log.PrettyFormat,
 	})
 
 	app.
 		UseLogger(logger).
 		Use(middlewares.CORS(), middlewares.RequestLogger(logger)).
-		BindGlobalInterceptors(global.LoggingInterceptor{}, global.ResponseInterceptor{})
+		BindGlobalInterceptors(globals.LoggingInterceptor{}, globals.ResponseInterceptor{})
 
 	app.Create(
 		core.ModuleBuilder().
@@ -33,5 +33,5 @@ func main() {
 
 	configService := app.Get(config.ConfigService{}).(config.ConfigService)
 
-	app.Logger.Fatal("AppError", "errMsg", app.Listen(configService.Get("PORT").(int)))
+	app.Logger.Fatal("AppError", "error", app.Listen(configService.Get("PORT").(int)))
 }

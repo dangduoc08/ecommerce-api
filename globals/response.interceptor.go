@@ -1,4 +1,4 @@
-package global
+package globals
 
 import (
 	"github.com/dangduoc08/gooh"
