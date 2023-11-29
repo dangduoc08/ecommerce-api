@@ -17,7 +17,7 @@ func (provider Provider) NewProvider() core.Provider {
 	return provider
 }
 
-func (provider Provider) CreateType(typeName string, values []string) {
+func (provider Provider) CreateEnum(typeName string, values []string) {
 	formatValues := utils.ArrMap[string](values, func(el string, i int) string {
 		return fmt.Sprintf("'%s'", el)
 	})

@@ -20,7 +20,7 @@ type Provider struct {
 }
 
 func (provider Provider) NewProvider() core.Provider {
-	provider.DatabaseProvider.CreateType("user_status", []string{ACTIVE, INACTIVE, SUSPENDED})
+	provider.DatabaseProvider.CreateEnum("user_status", []string{ACTIVE, INACTIVE, SUSPENDED})
 	provider.DatabaseProvider.DB.AutoMigrate(&User{})
 	provider.JWTKey = provider.ConfigService.Get("JWT_KEY").(string)
 
@@ -92,7 +92,7 @@ func (provider Provider) CreateOneUser(dto dtos.CREATE_create_Body_DTO) (*User, 
 		Hash:      hash,
 		FirstName: dto.Data.FirstName,
 		LastName:  dto.Data.LastName,
-		Status:    INACTIVE,
+		Status:    UserStatus(INACTIVE),
 	}
 
 	resp := provider.DatabaseProvider.DB.Create(user)

@@ -28,3 +28,4 @@ go.work
 
 # Draw.io
 *.bkp
+*.dtmp

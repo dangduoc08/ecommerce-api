@@ -3,6 +3,7 @@ package dtos
 import (
 	"fmt"
 
+	"github.com/dangduoc08/ecommerce-api/field"
 	"github.com/dangduoc08/gooh"
 	"github.com/dangduoc08/gooh/common"
 	"github.com/dangduoc08/gooh/exception"
@@ -32,7 +33,8 @@ func (dto CREATE_create_Body_DTO) Transform(
 	errMsgs := []string{}
 	if err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
-			errMsgs = append(errMsgs, fmt.Sprintf("Field: %s, Error: %s", err.Field(), err.Tag()))
+			f := field.UserMapField.GetField(err.Field())
+			errMsgs = append(errMsgs, fmt.Sprintf("Field: %s, Error: must be %s", f, err.Tag()))
 		}
 
 		panic(exception.UnprocessableEntityException(errMsgs))

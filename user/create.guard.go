@@ -3,14 +3,12 @@ package user
 import (
 	"github.com/dangduoc08/ecommerce-api/database"
 	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
 	"github.com/dangduoc08/gooh/exception"
 )
 
 type CreateGuard struct {
 	UserProvider     Provider
 	DatabaseProvider database.Provider
-	Logger           common.Logger
 }
 
 func (createGuard CreateGuard) CanActivate(ctx gooh.Context) bool {
@@ -26,7 +24,11 @@ func (createGuard CreateGuard) CanActivate(ctx gooh.Context) bool {
 	}
 	err := createGuard.UserProvider.CheckDuplicateUser(data)
 	if err != nil {
-		panic(exception.ConflictException("Duplicate user data"))
+		errMsgs := []string{
+			"Field: user.email or user.username",
+			"Error: duplicate data",
+		}
+		panic(exception.ConflictException(errMsgs))
 	}
 
 	return true

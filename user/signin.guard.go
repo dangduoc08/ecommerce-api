@@ -1,9 +1,12 @@
 package user
 
 import (
+	"fmt"
+
 	"github.com/dangduoc08/ecommerce-api/database"
 	"github.com/dangduoc08/gooh"
 	"github.com/dangduoc08/gooh/common"
+	"github.com/dangduoc08/gooh/exception"
 )
 
 type SigninGuard struct {
@@ -37,8 +40,8 @@ func (signinGuard SigninGuard) CanActivate(ctx gooh.Context) bool {
 		}
 
 		// check user should be active
-		if user.Status != ACTIVE {
-			return false
+		if user.Status != UserStatus(ACTIVE) {
+			panic(exception.UnauthorizedException(fmt.Sprintf("Field: user.status, Error: %s", user.Status)))
 		}
 
 		hash = user.Hash
