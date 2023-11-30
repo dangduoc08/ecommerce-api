@@ -1,7 +1,5 @@
-github.com/dangduoc08/gooh v0.0.0-20231128233338-74930fc5a062 h1:LIqYn9zKb7Fi28LsjSVPf9GMUnAMvw9F6NMvPQQeyYg=
-github.com/dangduoc08/gooh v0.0.0-20231128233338-74930fc5a062/go.mod h1:6wXDKnTBoadyTpCGcuR6Yb9zQzvUU0ua94UKb3Ktl+U=
-github.com/dangduoc08/gooh v0.0.0-20231129011316-b11e1abf9bf2 h1:A5mWtqmEzvxb+qwUaSDk6gsnKuQzVU4lxfY6bRkbcCA=
-github.com/dangduoc08/gooh v0.0.0-20231129011316-b11e1abf9bf2/go.mod h1:6wXDKnTBoadyTpCGcuR6Yb9zQzvUU0ua94UKb3Ktl+U=
+github.com/dangduoc08/gooh v0.0.0-20231129135907-73dd7308c05f h1:UH5I3scShN2Ezg2h6mvjSBipl1sBNfGidT9DtfKbIQg=
+github.com/dangduoc08/gooh v0.0.0-20231129135907-73dd7308c05f/go.mod h1:6wXDKnTBoadyTpCGcuR6Yb9zQzvUU0ua94UKb3Ktl+U=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

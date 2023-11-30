@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/dangduoc08/ecommerce-api/database"
 	"github.com/dangduoc08/ecommerce-api/user/dtos"
@@ -14,15 +15,17 @@ import (
 )
 
 type Provider struct {
-	DatabaseProvider database.Provider
-	ConfigService    config.ConfigService
-	JWTKey           string
+	DatabaseProvider   database.Provider
+	ConfigService      config.ConfigService
+	JWTAccessAPIKey    string
+	JWTRefreshTokenKey string
 }
 
 func (provider Provider) NewProvider() core.Provider {
 	provider.DatabaseProvider.CreateEnum("user_status", []string{ACTIVE, INACTIVE, SUSPENDED})
 	provider.DatabaseProvider.DB.AutoMigrate(&User{})
-	provider.JWTKey = provider.ConfigService.Get("JWT_KEY").(string)
+	provider.JWTAccessAPIKey = provider.ConfigService.Get("JWT_ACCESS_API_KEY").(string)
+	provider.JWTRefreshTokenKey = provider.ConfigService.Get("JWT_REFRESH_TOKEN_KEY").(string)
 
 	return provider
 }
@@ -36,22 +39,10 @@ func (provider Provider) hashPassword(password string) (string, error) {
 	return string(hashedPasswordBytes), err
 }
 
-func (provider Provider) genToken(data any) string {
-	var (
-		// key *ecdsa.PrivateKey
-		t *jwt.Token
-		s string
-	)
-
-	t = jwt.NewWithClaims(jwt.SigningMethodES256,
-		jwt.MapClaims{
-			"iss": "my-auth-server",
-			"sub": "john",
-			"foo": 2,
-		})
-	s, _ = t.SignedString(provider.JWTKey)
-
-	return s
+func (provider Provider) signToken(claims jwt.MapClaims, expIn int) (string, error) {
+	claims["exp"] = time.Now().Unix() + int64(expIn)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(provider.JWTAccessAPIKey))
 }
 
 func (provider Provider) CheckPasswordHash(password, hash string) bool {
@@ -96,6 +87,19 @@ func (provider Provider) CreateOneUser(dto dtos.CREATE_create_Body_DTO) (*User, 
 	}
 
 	resp := provider.DatabaseProvider.DB.Create(user)
+	if resp.Error != nil {
+		return nil, resp.Error
+	}
+
+	return user, nil
+}
+
+func (provider Provider) GetOneUserBy(id uint) (*User, error) {
+	user := &User{
+		ID: id,
+	}
+
+	resp := provider.DatabaseProvider.DB.First(user)
 	if resp.Error != nil {
 		return nil, resp.Error
 	}

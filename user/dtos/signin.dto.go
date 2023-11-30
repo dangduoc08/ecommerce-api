@@ -11,6 +11,7 @@ import (
 )
 
 type CREATE_signin_Body_Data_DTO struct {
+	ID       uint   `bind:"ID"`
 	Username string `bind:"username" validate:"required"`
 	Password string `bind:"password" validate:"required"`
 }
@@ -25,7 +26,6 @@ func (dto CREATE_signin_Body_DTO) Transform(
 ) any {
 	validate := validator.New()
 	signinBody := body.Bind(dto)
-
 	err := validate.Struct(signinBody)
 	errMsgs := []string{}
 	if err != nil {

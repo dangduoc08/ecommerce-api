@@ -23,7 +23,9 @@ func (signinGuard SigninGuard) CanActivate(ctx gooh.Context) bool {
 	}
 
 	hash := ""
-	if username, ok := ctx.Body().Get("data.username").(string); ok {
+	var id uint
+
+	if username, ok := body.Get("data.username").(string); ok {
 		user := &User{Username: username}
 		resp := signinGuard.DatabaseProvider.DB.
 			Where(user).
@@ -45,9 +47,11 @@ func (signinGuard SigninGuard) CanActivate(ctx gooh.Context) bool {
 		}
 
 		hash = user.Hash
+		id = user.ID
 	}
 
-	if password, ok := ctx.Body().Get("data.password").(string); ok {
+	if password, ok := body.Get("data.password").(string); ok {
+		body.Set("data.ID", float64(id))
 
 		// check password
 		return signinGuard.UserProvider.CheckPasswordHash(password, hash)
