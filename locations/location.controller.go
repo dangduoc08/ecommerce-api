@@ -9,22 +9,18 @@ import (
 )
 
 type LocationController struct {
-	common.Rest
+	common.REST
 	Logger           common.Logger
 	LocationProvider LocationProvider
 }
 
 func (self LocationController) NewController() core.Controller {
-	self.
-		Prefix("v1").
-		Prefix("locations")
+	self.Prefix("v1").Prefix("locations")
 
 	return self
 }
 
-func (self LocationController) READ(
-	query gooh.Query,
-) []Location {
+func (self LocationController) READ(query gooh.Query) []*Location {
 	var locationID *uint
 
 	if query.Get("location_id") != "" {
@@ -35,14 +31,14 @@ func (self LocationController) READ(
 		}
 	}
 
-	locations, err := self.LocationProvider.FindAllBy(locationID)
+	locations, err := self.LocationProvider.FindManyBy(locationID)
 	if err != nil {
 		self.Logger.Debug(
 			"LocationProvider.GetLists",
 			"error", err.Error(),
 			"locations", locations,
 		)
-		return []Location{}
+		return []*Location{}
 	}
 
 	return locations

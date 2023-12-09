@@ -1,6 +1,7 @@
 package globals
 
 import (
+	stdContext "context"
 	"fmt"
 	"strings"
 
@@ -15,13 +16,13 @@ type AccessAPIGuard struct {
 	JWTAccessAPIKey string
 }
 
-func (accessAPIGuard AccessAPIGuard) NewGuard() AccessAPIGuard {
-	accessAPIGuard.JWTAccessAPIKey = accessAPIGuard.ConfigService.Get("JWT_ACCESS_API_KEY").(string)
+func (self AccessAPIGuard) NewGuard() AccessAPIGuard {
+	self.JWTAccessAPIKey = self.ConfigService.Get("JWT_ACCESS_API_KEY").(string)
 
-	return accessAPIGuard
+	return self
 }
 
-func (accessAPIGuard AccessAPIGuard) CanActivate(ctx gooh.Context) bool {
+func (self AccessAPIGuard) CanActivate(ctx gooh.Context) bool {
 	accessTokenCookie, err := ctx.Cookie("access_token")
 	if err != nil {
 		return false
@@ -35,7 +36,7 @@ func (accessAPIGuard AccessAPIGuard) CanActivate(ctx gooh.Context) bool {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(accessAPIGuard.JWTAccessAPIKey), nil
+		return []byte(self.JWTAccessAPIKey), nil
 	})
 
 	if err != nil {
@@ -43,6 +44,8 @@ func (accessAPIGuard AccessAPIGuard) CanActivate(ctx gooh.Context) bool {
 	}
 
 	if token.Claims != nil {
+		ctxWithValue := stdContext.WithValue(ctx.Context(), "tokenClaims", token.Claims.(jwt.MapClaims))
+		ctx.Request = ctx.WithContext(ctxWithValue)
 		return true
 	}
 

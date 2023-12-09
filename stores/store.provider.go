@@ -20,9 +20,11 @@ func (self StoreProvider) GetModelName() string {
 	return path.Base(reflect.TypeOf(self).PkgPath())
 }
 
-func (self StoreProvider) GetOneByID(ID uint) (*Store, error) {
-	store := &Store{ID: ID}
-	resp := self.DBProvider.DB.Preload("Address").Take(store)
+func (self StoreProvider) FindOneByID(
+	id uint,
+) (*Store, error) {
+	store := &Store{ID: id}
+	resp := self.DBProvider.DB.Take(store)
 	if resp.Error != nil {
 		return nil, resp.Error
 	}

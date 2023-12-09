@@ -61,8 +61,18 @@ func (self LocationProvider) Seed(cb func(Location)) {
 	}
 }
 
-func (self LocationProvider) FindAllBy(locationID *uint) ([]Location, error) {
-	var locations []Location
+func (self LocationProvider) FindByID(id uint) (*Location, error) {
+	locationRec := &Location{
+		ID: id,
+	}
+
+	resp := self.DBProvider.DB.First(locationRec)
+
+	return locationRec, resp.Error
+}
+
+func (self LocationProvider) FindManyBy(locationID *uint) ([]*Location, error) {
+	var locations []*Location
 
 	resp := self.DBProvider.DB.
 		Select("id", "location_id", "name", "slug").

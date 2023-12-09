@@ -39,15 +39,15 @@ func (self UserProvider) HashPassword(password string) (string, error) {
 	return string(hashedPasswordBytes), err
 }
 
-func (self UserProvider) signToken(claims jwt.MapClaims, key string, expIn int) (string, error) {
+func (self UserProvider) CheckHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
+func (self UserProvider) SignToken(claims jwt.MapClaims, key string, expIn int) (string, error) {
 	claims["exp"] = time.Now().Unix() + int64(expIn)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(key))
-}
-
-func (self UserProvider) CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
 }
 
 func (self UserProvider) CheckDuplicateUser(data []map[string]string) error {
@@ -55,10 +55,9 @@ func (self UserProvider) CheckDuplicateUser(data []map[string]string) error {
 
 	for _, kv := range data {
 		for k, v := range kv {
-			var isExist uint
-			sql := fmt.Sprintf("SELECT id FROM %v WHERE %v = '%v';", self.GetModelName(), k, v)
-			self.DBProvider.DB.Raw(sql).Scan(&isExist)
-			if isExist != 0 {
+			var userRec User
+			self.DBProvider.DB.Where(fmt.Sprintf("%v = ?", k), fmt.Sprintf("%v", v)).First(&userRec)
+			if userRec.ID != 0 {
 				errMsgs = append(errMsgs, fmt.Sprintf("%v: '%v' is duplicated", k, v))
 			}
 		}
@@ -71,21 +70,12 @@ func (self UserProvider) CheckDuplicateUser(data []map[string]string) error {
 	return nil
 }
 
-func (self UserProvider) CreateOneUser(dto CREATE_Body_DTO) (*User, error) {
-	hash, err := self.HashPassword(dto.Data.Password)
-	if err != nil {
-		return nil, err
-	}
-
+func (self UserProvider) FindByID(id uint) (*User, error) {
 	user := &User{
-		Username:  dto.Data.Username,
-		Email:     dto.Data.Email,
-		Hash:      hash,
-		FirstName: dto.Data.FirstName,
-		LastName:  dto.Data.LastName,
+		ID: id,
 	}
 
-	resp := self.DBProvider.DB.Create(user)
+	resp := self.DBProvider.DB.First(user)
 	if resp.Error != nil {
 		return nil, resp.Error
 	}
@@ -93,12 +83,41 @@ func (self UserProvider) CreateOneUser(dto CREATE_Body_DTO) (*User, error) {
 	return user, nil
 }
 
-func (self UserProvider) GetOneUserBy(id uint) (*User, error) {
-	user := &User{
-		ID: id,
+func (self UserProvider) FindOneBy(query *UserQuery) (*User, error) {
+	user := &User{}
+
+	if query.Username != "" {
+		user.Username = query.Username
 	}
 
-	resp := self.DBProvider.DB.First(user)
+	if query.Email != "" {
+		user.Email = query.Email
+	}
+
+	resp := self.DBProvider.DB.Where(user).First(user)
+	if resp.Error != nil {
+		return nil, resp.Error
+	}
+
+	return user, nil
+}
+
+func (self UserProvider) CreateOne(data *UserCreation) (*User, error) {
+	hash, err := self.HashPassword(data.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	user := &User{
+		StoreID:   data.StoreID,
+		Username:  data.Username,
+		Email:     data.Email,
+		Hash:      hash,
+		FirstName: data.FirstName,
+		LastName:  data.LastName,
+	}
+
+	resp := self.DBProvider.DB.Create(user)
 	if resp.Error != nil {
 		return nil, resp.Error
 	}

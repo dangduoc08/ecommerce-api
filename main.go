@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/dangduoc08/ecommerce-api/addresses"
 	"github.com/dangduoc08/ecommerce-api/conf"
 	"github.com/dangduoc08/ecommerce-api/db"
 	"github.com/dangduoc08/ecommerce-api/globals"
@@ -35,6 +36,7 @@ func main() {
 				stores.StoreModule,
 				seeds.SeedModule,
 				locations.LocationModule,
+				addresses.AddressModule,
 			).
 			Build(),
 	)

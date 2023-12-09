@@ -12,6 +12,7 @@ type User struct {
 	FirstName string     `json:"first_name" gorm:"not null"`
 	LastName  string     `json:"last_name" gorm:"not null"`
 	Status    UserStatus `json:"status" gorm:"not null;type:user_status;default:inactive"`
+	StoreID   uint       `json:"-"`
 	CreatedAt time.Time  `json:"created_at" gorm:"autoCreateTime:true"`
 	UpdatedAt time.Time  `json:"updated_at" gorm:"autoUpdateTime:true"`
 }

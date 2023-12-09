@@ -1,9 +1,9 @@
 package stores
 
 import (
+	"fmt"
 	"strconv"
 
-	"github.com/dangduoc08/ecommerce-api/globals"
 	"github.com/dangduoc08/gooh"
 	"github.com/dangduoc08/gooh/common"
 	"github.com/dangduoc08/gooh/core"
@@ -12,7 +12,7 @@ import (
 )
 
 type StoreController struct {
-	common.Rest
+	common.REST
 	common.Guard
 	Logger        common.Logger
 	StoreProvider StoreProvider
@@ -24,14 +24,28 @@ func (self StoreController) NewController() core.Controller {
 		Prefix("v1").
 		Prefix("stores")
 
-	self.
-		BindGuard(globals.AccessAPIGuard{})
-
 	return self
 }
 
-func (self StoreController) UPDATE_BY_id() {
+func (self StoreController) CREATE_addresses_OF_BY_id() {
 
+}
+
+func (self StoreController) UPDATE_BY_id(
+	param gooh.Param,
+	body UPDATE_BY_ID_Body_DTO,
+) {
+	var storeID uint
+
+	if param.Get("id") != "" {
+		u64StoreID, err := strconv.ParseUint(param.Get("id"), 10, 64)
+		if err != nil {
+			panic(exception.UnprocessableEntityException(err.Error()))
+		}
+		storeID = uint(u64StoreID)
+	}
+
+	fmt.Println(storeID, body)
 }
 
 func (self StoreController) READ_BY_id(
@@ -48,7 +62,7 @@ func (self StoreController) READ_BY_id(
 		panic(exception.UnprocessableEntityException(err.Error()))
 	}
 
-	store, err := self.StoreProvider.GetOneByID(uint(id))
+	store, err := self.StoreProvider.FindOneByID(uint(id))
 	if err != nil {
 		panic(exception.NotFoundException(err.Error()))
 	}

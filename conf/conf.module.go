@@ -50,23 +50,28 @@ var ConfigModule = config.Register(&config.ConfigModuleOptions{
 			// transform to proper types
 			dtoConfig := c.Transform(Config{}).(Config)
 			Value = dtoConfig
+			errMsgs := []string{}
 
 			// validate config values should be added correctly
 			v := validator.New()
 			v.RegisterValidation("AppENVEnum", utils.ValidateEnum(
-				APP_ENV_DEV,
-				APP_ENV_TEST,
-				APP_ENV_PROD,
+				[]string{APP_ENV_DEV, APP_ENV_TEST, APP_ENV_PROD},
+				func(err error) {
+					if err != nil {
+						errMsgs = append(errMsgs, err.Error())
+					}
+				},
 			))
 
 			err := v.Struct(dtoConfig)
-			errMsgs := []string{}
 			if err != nil {
 				for _, err := range err.(validator.ValidationErrors) {
-					errMsgs = append(errMsgs, fmt.Sprintf("'%s' %s", err.Field(), err.Tag()))
+					errMsgs = append(errMsgs, fmt.Sprintf("Field: %s, Error: must be %s", err.Field(), err.Tag()))
 				}
+			}
 
-				panic(strings.Join(errMsgs, ", "))
+			if len(errMsgs) > 0 {
+				panic(strings.Join(errMsgs, "\n       "))
 			}
 
 			// re-assign to config struct

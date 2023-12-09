@@ -15,10 +15,10 @@ type LoggingInterceptor struct {
 	Logger        common.Logger
 }
 
-func (i LoggingInterceptor) Intercept(c gooh.Context, aggregation gooh.Aggregation) any {
+func (self LoggingInterceptor) Intercept(c gooh.Context, aggregation gooh.Aggregation) any {
 	datas := []any{}
 
-	if c.Method == http.MethodPost {
+	if c.Method == http.MethodPost || c.Method == http.MethodPut || c.Method == http.MethodPatch {
 		body := c.Body()
 		if len(body) > 0 {
 			bodyJSON, _ := json.Marshal(body)
@@ -55,7 +55,7 @@ func (i LoggingInterceptor) Intercept(c gooh.Context, aggregation gooh.Aggregati
 	}
 
 	datas = append(datas, "X-Request-ID", c.GetID())
-	i.Logger.Debug(
+	self.Logger.Debug(
 		"Request",
 		datas...,
 	)
@@ -65,13 +65,13 @@ func (i LoggingInterceptor) Intercept(c gooh.Context, aggregation gooh.Aggregati
 			resJSON, _ := json.Marshal(data)
 			resJSONStr := string(resJSON)
 			if resJSONStr != "{}" {
-				i.Logger.Debug(
+				self.Logger.Debug(
 					"Success",
 					"data", resJSONStr,
 					"X-Request-ID", ctx.GetID(),
 				)
 			} else {
-				i.Logger.Debug(
+				self.Logger.Debug(
 					"Success",
 					"data", nil,
 					"X-Request-ID", ctx.GetID(),
@@ -81,14 +81,14 @@ func (i LoggingInterceptor) Intercept(c gooh.Context, aggregation gooh.Aggregati
 		}),
 		aggregation.Error(func(ctx gooh.Context, err any) any {
 			if httpException, ok := err.(exception.HTTPException); ok {
-				i.Logger.Debug(
+				self.Logger.Debug(
 					"Error",
 					"data", err,
 					"message", httpException.GetResponse(),
 					"X-Request-ID", ctx.GetID(),
 				)
 			} else {
-				i.Logger.Debug(
+				self.Logger.Debug(
 					"Error",
 					"data", err,
 					"X-Request-ID", ctx.GetID(),

@@ -32,7 +32,7 @@ func (self SeedProvider) NewProvider() core.Provider {
 		users.SUSPENDED,
 	})
 
-	// // Create tables
+	// Create tables
 	err := self.DBProvider.DB.AutoMigrate(&locations.Location{})
 	if err != nil {
 		panic(err)
@@ -64,46 +64,32 @@ func (self SeedProvider) NewProvider() core.Provider {
 		})
 	}
 
+	// Seed users
+	hash, err := self.UserProvider.HashPassword(self.ConfigService.Get("PASSWORD").(string))
+	if err != nil {
+		panic(err)
+	}
+	user := users.User{
+		Username:  self.ConfigService.Get("USERNAME").(string),
+		Email:     self.ConfigService.Get("EMAIL").(string),
+		FirstName: self.ConfigService.Get("FIRST_NAME").(string),
+		LastName:  self.ConfigService.Get("LAST_NAME").(string),
+		Hash:      hash,
+		Status:    users.UserStatus(users.ACTIVE),
+	}
+
 	// Seed stores
 	totalStores := self.DBProvider.Count(self.StoreProvider.GetModelName())
 	if totalStores == 0 {
-		var locationID1 uint = 1
-		var locationID2 uint = 2
 		resp := self.DBProvider.DB.Create(&stores.Store{
 			Name:        "Demo",
 			Description: "Demo shop",
 			Email:       self.ConfigService.Get("EMAIL").(string),
-			Addresses: []addresses.Address{
-				{
-					LocationID: &locationID1,
-				},
-				{
-					LocationID: &locationID2,
-				},
-			},
+			Addresses:   []addresses.Address{},
+			Users:       []users.User{user},
 		})
 		if resp.Error != nil {
 			self.Logger.Debug("SeedStores", "error", resp.Error)
-		}
-	}
-
-	// Seed users
-	totalUsers := self.DBProvider.Count(self.UserProvider.GetModelName())
-	if totalUsers == 0 {
-		hash, err := self.UserProvider.HashPassword(self.ConfigService.Get("PASSWORD").(string))
-		if err != nil {
-			panic(err)
-		}
-		resp := self.DBProvider.DB.Create(&users.User{
-			Username:  self.ConfigService.Get("USERNAME").(string),
-			Hash:      hash,
-			Email:     self.ConfigService.Get("EMAIL").(string),
-			FirstName: self.ConfigService.Get("FIRST_NAME").(string),
-			LastName:  self.ConfigService.Get("LAST_NAME").(string),
-			Status:    users.UserStatus(users.ACTIVE),
-		})
-		if resp.Error != nil {
-			self.Logger.Debug("SeedUsers", "error", resp.Error)
 		}
 	}
 
