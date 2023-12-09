@@ -1,9 +1,13 @@
 package main
 
 import (
-	appConfig "github.com/dangduoc08/ecommerce-api/config"
+	"github.com/dangduoc08/ecommerce-api/conf"
+	"github.com/dangduoc08/ecommerce-api/db"
 	"github.com/dangduoc08/ecommerce-api/globals"
-	"github.com/dangduoc08/ecommerce-api/user"
+	"github.com/dangduoc08/ecommerce-api/locations"
+	"github.com/dangduoc08/ecommerce-api/seeds"
+	"github.com/dangduoc08/ecommerce-api/stores"
+	"github.com/dangduoc08/ecommerce-api/users"
 	"github.com/dangduoc08/gooh/core"
 	"github.com/dangduoc08/gooh/log"
 	"github.com/dangduoc08/gooh/middlewares"
@@ -25,8 +29,12 @@ func main() {
 	app.Create(
 		core.ModuleBuilder().
 			Imports(
-				appConfig.Module,
-				user.Module,
+				db.DBModule,
+				conf.ConfigModule,
+				users.UserModule,
+				stores.StoreModule,
+				seeds.SeedModule,
+				locations.LocationModule,
 			).
 			Build(),
 	)

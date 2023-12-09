@@ -1,4 +1,4 @@
-package dtos
+package users
 
 import (
 	"fmt"
@@ -10,17 +10,17 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type CREATE_signin_Body_Data_DTO struct {
+type CREATE_sessions_Body_Data_DTO struct {
 	ID       uint   `bind:"ID"`
 	Username string `bind:"username" validate:"required"`
 	Password string `bind:"password" validate:"required"`
 }
 
-type CREATE_signin_Body_DTO struct {
-	Data CREATE_signin_Body_Data_DTO `bind:"data"`
+type CREATE_sessions_Body_DTO struct {
+	Data CREATE_sessions_Body_Data_DTO `bind:"data"`
 }
 
-func (dto CREATE_signin_Body_DTO) Transform(
+func (dto CREATE_sessions_Body_DTO) Transform(
 	body gooh.Body,
 	medata common.ArgumentMetadata,
 ) any {

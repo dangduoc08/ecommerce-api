@@ -3,7 +3,7 @@ module github.com/dangduoc08/ecommerce-api
 go 1.21.4
 
 require (
-	github.com/dangduoc08/gooh v0.0.0-20231129135907-73dd7308c05f
+	github.com/dangduoc08/gooh v0.0.0-20231206093903-461a7dc7ff9f
 	github.com/go-playground/validator/v10 v10.16.0
 	github.com/golang-jwt/jwt/v5 v5.1.0
 	golang.org/x/crypto v0.16.0

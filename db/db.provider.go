@@ -1,4 +1,4 @@
-package database
+package db
 
 import (
 	"fmt"
@@ -9,15 +9,16 @@ import (
 	"gorm.io/gorm"
 )
 
-type Provider struct {
+type DBProvider struct {
 	DB *gorm.DB
 }
 
-func (provider Provider) NewProvider() core.Provider {
-	return provider
+func (dbProvider DBProvider) NewProvider() core.Provider {
+
+	return dbProvider
 }
 
-func (provider Provider) CreateEnum(typeName string, values []string) {
+func (dbProvider DBProvider) CreateEnum(typeName string, values []string) {
 	formatValues := utils.ArrMap[string](values, func(el string, i int) string {
 		return fmt.Sprintf("'%s'", el)
 	})
@@ -30,8 +31,17 @@ func (provider Provider) CreateEnum(typeName string, values []string) {
 			END IF;
 		END $$;`, typeName, typeName, strings.Join(formatValues, ", "))
 
-	resp := provider.DB.Exec(sql)
+	resp := dbProvider.DB.Exec(sql)
 	if resp.Error != nil {
 		panic(resp.Error)
 	}
+}
+
+func (formatValues DBProvider) Count(tableName string) int {
+	var count int
+	if err := formatValues.DB.Raw(fmt.Sprintf("SELECT count(*) FROM %v", tableName)).Scan(&count).Error; err != nil {
+		panic(err)
+	}
+
+	return count
 }

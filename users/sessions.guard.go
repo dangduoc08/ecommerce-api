@@ -1,21 +1,21 @@
-package user
+package users
 
 import (
 	"fmt"
 
-	"github.com/dangduoc08/ecommerce-api/database"
+	"github.com/dangduoc08/ecommerce-api/db"
 	"github.com/dangduoc08/gooh"
 	"github.com/dangduoc08/gooh/common"
 	"github.com/dangduoc08/gooh/exception"
 )
 
-type SigninGuard struct {
-	UserProvider     Provider
-	DatabaseProvider database.Provider
-	Logger           common.Logger
+type SessionsGuard struct {
+	UserProvider UserProvider
+	DBProvider   db.DBProvider
+	Logger       common.Logger
 }
 
-func (signinGuard SigninGuard) CanActivate(ctx gooh.Context) bool {
+func (self SessionsGuard) CanActivate(ctx gooh.Context) bool {
 	body := ctx.Body()
 
 	if !body.Has("data.password") || !body.Has("data.username") {
@@ -27,13 +27,13 @@ func (signinGuard SigninGuard) CanActivate(ctx gooh.Context) bool {
 
 	if username, ok := body.Get("data.username").(string); ok {
 		user := &User{Username: username}
-		resp := signinGuard.DatabaseProvider.DB.
+		resp := self.DBProvider.DB.
 			Where(user).
 			First(user)
 
 		// check user exists in db
 		if resp.Error != nil {
-			signinGuard.Logger.Debug(
+			self.Logger.Debug(
 				"Error While Query",
 				"error", resp.Error.Error(),
 				"X-Request-ID", ctx.GetID(),
@@ -54,7 +54,7 @@ func (signinGuard SigninGuard) CanActivate(ctx gooh.Context) bool {
 		body.Set("data.ID", float64(id))
 
 		// check password
-		return signinGuard.UserProvider.CheckPasswordHash(password, hash)
+		return self.UserProvider.CheckPasswordHash(password, hash)
 	}
 
 	return false

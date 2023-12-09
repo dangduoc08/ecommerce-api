@@ -1,16 +1,30 @@
-package config
+package conf
 
 import (
 	"fmt"
 	"reflect"
 	"strings"
 
+	"github.com/dangduoc08/ecommerce-api/utils"
 	"github.com/dangduoc08/gooh/modules/config"
 	"github.com/go-playground/validator/v10"
 )
 
+const (
+	APP_ENV_DEV  = "development"
+	APP_ENV_TEST = "test"
+	APP_ENV_PROD = "production"
+)
+
 type Config struct {
-	Port int `bind:"PORT" validate:"required"`
+	Port   int    `bind:"PORT" validate:"required"`
+	AppENV string `bind:"APP_ENV" validate:"AppENVEnum"`
+
+	Username  string `bind:"USERNAME" validate:"required"`
+	Password  string `bind:"PASSWORD" validate:"required"`
+	Email     string `bind:"EMAIL" validate:"required,email"`
+	FirstName string `bind:"FIRST_NAME" validate:"required"`
+	LastName  string `bind:"LAST_NAME" validate:"required"`
 
 	JWTAccessAPIKey      string `bind:"JWT_ACCESS_API_KEY" validate:"required"`
 	JWTAccessAPIExpIn    int    `bind:"JWT_ACCESS_API_EXP_IN" validate:"required"`
@@ -25,7 +39,9 @@ type Config struct {
 	PostgresSSL      bool   `bind:"POSTGRES_SSL" validate:"boolean"`
 }
 
-var Module = config.Register(&config.ConfigModuleOptions{
+var Value Config
+
+var ConfigModule = config.Register(&config.ConfigModuleOptions{
 	IsGlobal:          true,
 	IsExpandVariables: true,
 	Hooks: []config.ConfigHookFn{
@@ -33,10 +49,17 @@ var Module = config.Register(&config.ConfigModuleOptions{
 
 			// transform to proper types
 			dtoConfig := c.Transform(Config{}).(Config)
+			Value = dtoConfig
 
 			// validate config values should be added correctly
-			validate := validator.New()
-			err := validate.Struct(dtoConfig)
+			v := validator.New()
+			v.RegisterValidation("AppENVEnum", utils.ValidateEnum(
+				APP_ENV_DEV,
+				APP_ENV_TEST,
+				APP_ENV_PROD,
+			))
+
+			err := v.Struct(dtoConfig)
 			errMsgs := []string{}
 			if err != nil {
 				for _, err := range err.(validator.ValidationErrors) {
