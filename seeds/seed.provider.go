@@ -3,6 +3,7 @@ package seeds
 import (
 	"github.com/dangduoc08/ecommerce-api/addresses"
 	"github.com/dangduoc08/ecommerce-api/db"
+	"github.com/dangduoc08/ecommerce-api/groups"
 	"github.com/dangduoc08/ecommerce-api/locations"
 	"github.com/dangduoc08/ecommerce-api/stores"
 	"github.com/dangduoc08/ecommerce-api/users"
@@ -21,6 +22,7 @@ type SeedProvider struct {
 	UserProvider     users.UserProvider
 	LocationProvider locations.LocationProvider
 	StoreProvider    stores.StoreProvider
+	GroupProvider    groups.GroupProvider
 }
 
 func (self SeedProvider) NewProvider() core.Provider {
@@ -44,6 +46,11 @@ func (self SeedProvider) NewProvider() core.Provider {
 	}
 
 	err = self.DBProvider.DB.AutoMigrate(&stores.Store{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = self.DBProvider.DB.AutoMigrate(&groups.Group{})
 	if err != nil {
 		panic(err)
 	}
@@ -76,6 +83,12 @@ func (self SeedProvider) NewProvider() core.Provider {
 		LastName:  self.ConfigService.Get("LAST_NAME").(string),
 		Hash:      hash,
 		Status:    users.UserStatus(users.ACTIVE),
+		Groups: []groups.Group{
+			{
+				Name:        "Administrator",
+				Permissions: []string{"*"},
+			},
+		},
 	}
 
 	// Seed stores

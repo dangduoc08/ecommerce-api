@@ -4,7 +4,9 @@ import (
 	"github.com/dangduoc08/ecommerce-api/addresses"
 	"github.com/dangduoc08/ecommerce-api/conf"
 	"github.com/dangduoc08/ecommerce-api/db"
+	"github.com/dangduoc08/ecommerce-api/files"
 	"github.com/dangduoc08/ecommerce-api/globals"
+	"github.com/dangduoc08/ecommerce-api/groups"
 	"github.com/dangduoc08/ecommerce-api/locations"
 	"github.com/dangduoc08/ecommerce-api/seeds"
 	"github.com/dangduoc08/ecommerce-api/stores"
@@ -37,6 +39,8 @@ func main() {
 				seeds.SeedModule,
 				locations.LocationModule,
 				addresses.AddressModule,
+				files.FileModule,
+				groups.GroupModule,
 			).
 			Build(),
 	)

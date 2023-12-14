@@ -1,6 +1,7 @@
 package seeds
 
 import (
+	"github.com/dangduoc08/ecommerce-api/groups"
 	"github.com/dangduoc08/ecommerce-api/locations"
 	"github.com/dangduoc08/ecommerce-api/stores"
 	"github.com/dangduoc08/ecommerce-api/users"
@@ -12,6 +13,7 @@ var SeedModule = core.ModuleBuilder().
 		users.UserModule,
 		stores.StoreModule,
 		locations.LocationModule,
+		groups.GroupModule,
 	).
 	Providers(
 		SeedProvider{},
