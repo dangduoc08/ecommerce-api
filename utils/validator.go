@@ -19,6 +19,20 @@ func ValidateEnum(enums []string, cb func(error)) validator.Func {
 	}
 }
 
+func ValidateEnums(enums []string, cb func(error)) validator.Func {
+	return func(fl validator.FieldLevel) bool {
+		totalValue := fl.Field().Len()
+		values := fl.Field().Slice(0, totalValue).Interface().([]string)
+		for i, value := range values {
+			if !utils.ArrIncludes[string](enums, value) {
+				cb(fmt.Errorf("Field: `%v.%v`, Error: must be in %v", fl.FieldName(), i, enums))
+			}
+		}
+
+		return true
+	}
+}
+
 func ValidatePhone(countryCode string, cb func(error)) validator.Func {
 	return func(fl validator.FieldLevel) bool {
 		num, _ := phonenumbers.Parse(fl.Field().String(), countryCode)

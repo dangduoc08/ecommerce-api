@@ -61,37 +61,37 @@ func (self LoggingInterceptor) Intercept(c gooh.Context, aggregation gooh.Aggreg
 	)
 
 	return aggregation.Pipe(
-		aggregation.Consume(func(ctx gooh.Context, data any) any {
+		aggregation.Consume(func(c gooh.Context, data any) any {
 			resJSON, _ := json.Marshal(data)
 			resJSONStr := string(resJSON)
 			if resJSONStr != "{}" {
 				self.Logger.Debug(
 					"Success",
 					"data", resJSONStr,
-					"X-Request-ID", ctx.GetID(),
+					"X-Request-ID", c.GetID(),
 				)
 			} else {
 				self.Logger.Debug(
 					"Success",
 					"data", nil,
-					"X-Request-ID", ctx.GetID(),
+					"X-Request-ID", c.GetID(),
 				)
 			}
 			return data
 		}),
-		aggregation.Error(func(ctx gooh.Context, err any) any {
+		aggregation.Error(func(c gooh.Context, err any) any {
 			if httpException, ok := err.(exception.HTTPException); ok {
 				self.Logger.Debug(
 					"Error",
 					"data", err,
 					"message", httpException.GetResponse(),
-					"X-Request-ID", ctx.GetID(),
+					"X-Request-ID", c.GetID(),
 				)
 			} else {
 				self.Logger.Debug(
 					"Error",
 					"data", err,
-					"X-Request-ID", ctx.GetID(),
+					"X-Request-ID", c.GetID(),
 				)
 			}
 

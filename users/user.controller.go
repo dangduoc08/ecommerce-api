@@ -70,7 +70,7 @@ func (self UserController) CREATE(accessTokenDTO globals.AccessTokenDTO, bodyDTO
 	return user
 }
 
-func (self UserController) CREATE_sessions(ctx gooh.Context, bodyDTO CREATE_sessions_Body_DTO) any {
+func (self UserController) CREATE_sessions(c gooh.Context, bodyDTO CREATE_sessions_Body_DTO) any {
 	user, err := self.UserProvider.FindOneBy(&UserQuery{
 		Username: bodyDTO.Data.Username,
 	})
@@ -79,7 +79,7 @@ func (self UserController) CREATE_sessions(ctx gooh.Context, bodyDTO CREATE_sess
 		self.Logger.Debug(
 			"Error While Query",
 			"error", err.Error(),
-			"X-Request-ID", ctx.GetID(),
+			"X-Request-ID", c.GetID(),
 		)
 		panic(exception.NotFoundException(err.Error()))
 	}
@@ -93,13 +93,16 @@ func (self UserController) CREATE_sessions(ctx gooh.Context, bodyDTO CREATE_sess
 		panic(exception.UnauthorizedException("Field: user.password, Error: not match"))
 	}
 
+	permissions := self.UserProvider.getUserPermissions(user.Groups)
+
 	accessToken, err := self.UserProvider.SignToken(
 		jwt.MapClaims{
-			"id":         user.ID,
-			"store_id":   user.StoreID,
-			"first_name": user.FirstName,
-			"last_name":  user.LastName,
-			"email":      user.Email,
+			"id":          user.ID,
+			"store_id":    user.StoreID,
+			"first_name":  user.FirstName,
+			"last_name":   user.LastName,
+			"email":       user.Email,
+			"permissions": permissions,
 		},
 		self.JWTAccessAPIKey,
 		self.JWTAccessAPIExpIn,

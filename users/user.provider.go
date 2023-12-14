@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/dangduoc08/ecommerce-api/db"
+	"github.com/dangduoc08/ecommerce-api/groups"
+	"github.com/dangduoc08/ecommerce-api/utils"
 	"github.com/dangduoc08/gooh/common"
 	"github.com/dangduoc08/gooh/core"
 	"github.com/dangduoc08/gooh/modules/config"
@@ -94,7 +96,7 @@ func (self UserProvider) FindOneBy(query *UserQuery) (*User, error) {
 		user.Email = query.Email
 	}
 
-	resp := self.DBProvider.DB.Where(user).First(user)
+	resp := self.DBProvider.DB.Where(user).Preload("Groups").First(user)
 	if resp.Error != nil {
 		return nil, resp.Error
 	}
@@ -123,4 +125,14 @@ func (self UserProvider) CreateOne(data *UserCreation) (*User, error) {
 	}
 
 	return user, nil
+}
+
+func (self UserProvider) getUserPermissions(grs []groups.Group) []string {
+	permissions := []string{}
+
+	for _, gr := range grs {
+		permissions = append(permissions, gr.Permissions...)
+	}
+
+	return utils.ArrToUnique[string](permissions)
 }

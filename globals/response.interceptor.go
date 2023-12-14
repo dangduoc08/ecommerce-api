@@ -11,7 +11,7 @@ type ResponseInterceptor struct {
 
 func (self ResponseInterceptor) Intercept(c gooh.Context, aggregation gooh.Aggregation) any {
 	return aggregation.Pipe(
-		aggregation.Consume(func(ctx gooh.Context, data any) any {
+		aggregation.Consume(func(c gooh.Context, data any) any {
 			transformedData := gooh.Map{
 				"data": data,
 			}

@@ -1,7 +1,7 @@
 package globals
 
 import (
-	stdContext "context"
+	"context"
 	"fmt"
 	"strings"
 
@@ -22,8 +22,8 @@ func (self AccessAPIGuard) NewGuard() AccessAPIGuard {
 	return self
 }
 
-func (self AccessAPIGuard) CanActivate(ctx gooh.Context) bool {
-	accessTokenCookie, err := ctx.Cookie("access_token")
+func (self AccessAPIGuard) CanActivate(c gooh.Context) bool {
+	accessTokenCookie, err := c.Cookie("access_token")
 	if err != nil {
 		return false
 	}
@@ -44,8 +44,8 @@ func (self AccessAPIGuard) CanActivate(ctx gooh.Context) bool {
 	}
 
 	if token.Claims != nil {
-		ctxWithValue := stdContext.WithValue(ctx.Context(), "tokenClaims", token.Claims.(jwt.MapClaims))
-		ctx.Request = ctx.WithContext(ctxWithValue)
+		ctxWithValue := context.WithValue(c.Context(), "tokenClaims", token.Claims.(jwt.MapClaims))
+		c.Request = c.WithContext(ctxWithValue)
 		return true
 	}
 

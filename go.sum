@@ -12,6 +12,16 @@ github.com/dangduoc08/gooh v0.0.0-20231206093903-461a7dc7ff9f h1:VgQhT6uOQNORbz+
 github.com/dangduoc08/gooh v0.0.0-20231206093903-461a7dc7ff9f/go.mod h1:6wXDKnTBoadyTpCGcuR6Yb9zQzvUU0ua94UKb3Ktl+U=
 github.com/dangduoc08/gooh v0.0.0-20231210094513-9bebd8007e08 h1:kVVhURZh4a6+IQ5LbqA4kb9mc2JqLJLFoqVSTAK52U0=
 github.com/dangduoc08/gooh v0.0.0-20231210094513-9bebd8007e08/go.mod h1:6wXDKnTBoadyTpCGcuR6Yb9zQzvUU0ua94UKb3Ktl+U=
+github.com/dangduoc08/gooh v0.0.0-20231212182706-308e77151957 h1:r+Fr94VSmMw1C7L2WT/DKyKqtbXe36oMv3H6efHycVg=
+github.com/dangduoc08/gooh v0.0.0-20231212182706-308e77151957/go.mod h1:6wXDKnTBoadyTpCGcuR6Yb9zQzvUU0ua94UKb3Ktl+U=
+github.com/dangduoc08/gooh v0.0.0-20231213164201-ea02eb895c5f h1:ybOjxU9SRhzimIM3eSyqnBBtvJm2/aKKEffVBn8HB/8=
+github.com/dangduoc08/gooh v0.0.0-20231213164201-ea02eb895c5f/go.mod h1:6wXDKnTBoadyTpCGcuR6Yb9zQzvUU0ua94UKb3Ktl+U=
+github.com/dangduoc08/gooh v0.0.0-20231214071421-117da678b8a0 h1:50iy+Tw8LLZ2thDBfvyx/aG09dRVpBDsjfi42VgddFM=
+github.com/dangduoc08/gooh v0.0.0-20231214071421-117da678b8a0/go.mod h1:6wXDKnTBoadyTpCGcuR6Yb9zQzvUU0ua94UKb3Ktl+U=
+github.com/dangduoc08/gooh v0.0.0-20231214095839-c710c8edc171 h1:B//smKQ30GASvr9Cm2VWtyXNX+LUjF1sbiHE1bC5FbI=
+github.com/dangduoc08/gooh v0.0.0-20231214095839-c710c8edc171/go.mod h1:6wXDKnTBoadyTpCGcuR6Yb9zQzvUU0ua94UKb3Ktl+U=
+github.com/dangduoc08/gooh v0.0.0-20231214100324-df515b75acb4 h1:1XgKNmnVYxZsUo4Ad8En9ISC3ftLK57Now1hgTbx8/E=
+github.com/dangduoc08/gooh v0.0.0-20231214100324-df515b75acb4/go.mod h1:6wXDKnTBoadyTpCGcuR6Yb9zQzvUU0ua94UKb3Ktl+U=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
