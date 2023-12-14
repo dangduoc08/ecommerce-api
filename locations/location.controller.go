@@ -34,7 +34,7 @@ func (self LocationController) READ(query gooh.Query) []*Location {
 	locations, err := self.LocationProvider.FindManyBy(locationID)
 	if err != nil {
 		self.Logger.Debug(
-			"LocationProvider.GetLists",
+			"LocationProvider.FindManyBy",
 			"error", err.Error(),
 			"locations", locations,
 		)

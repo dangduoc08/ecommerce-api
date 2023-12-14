@@ -11,18 +11,32 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type AccessAPIGuard struct {
+type AuthGuard struct {
 	ConfigService   config.ConfigService
 	JWTAccessAPIKey string
 }
 
-func (self AccessAPIGuard) NewGuard() AccessAPIGuard {
+func (self AuthGuard) NewGuard() AuthGuard {
 	self.JWTAccessAPIKey = self.ConfigService.Get("JWT_ACCESS_API_KEY").(string)
 
 	return self
 }
 
-func (self AccessAPIGuard) CanActivate(c gooh.Context) bool {
+func (self AuthGuard) checkPermission(accessTo string, permissions []any) bool {
+	if len(permissions) == 1 && permissions[0].(string) == "*" {
+		return true
+	}
+
+	for _, permission := range permissions {
+		if accessTo == permission.(string) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (self AuthGuard) CanActivate(c gooh.Context) bool {
 	accessTokenCookie, err := c.Cookie("access_token")
 	if err != nil {
 		return false
@@ -44,9 +58,11 @@ func (self AccessAPIGuard) CanActivate(c gooh.Context) bool {
 	}
 
 	if token.Claims != nil {
+		matchedRoute := c.Method + c.GetRoute()
 		ctxWithValue := context.WithValue(c.Context(), "tokenClaims", token.Claims.(jwt.MapClaims))
 		c.Request = c.WithContext(ctxWithValue)
-		return true
+
+		return self.checkPermission(matchedRoute, token.Claims.(jwt.MapClaims)["permissions"].([]any))
 	}
 
 	return false
