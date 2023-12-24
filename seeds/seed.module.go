@@ -1,21 +1,22 @@
 package seeds
 
 import (
-	"github.com/dangduoc08/ecommerce-api/groups"
+	"github.com/dangduoc08/ecommerce-api/auths"
 	"github.com/dangduoc08/ecommerce-api/locations"
+	"github.com/dangduoc08/ecommerce-api/seeds/providers"
 	"github.com/dangduoc08/ecommerce-api/stores"
 	"github.com/dangduoc08/ecommerce-api/users"
 	"github.com/dangduoc08/gooh/core"
 )
 
-var SeedModule = core.ModuleBuilder().
+var Module = core.ModuleBuilder().
 	Imports(
-		users.UserModule,
-		stores.StoreModule,
-		locations.LocationModule,
-		groups.GroupModule,
+		users.Module,
+		stores.Module,
+		locations.Module,
+		auths.Module,
 	).
 	Providers(
-		SeedProvider{},
+		providers.Seed{},
 	).
 	Build()

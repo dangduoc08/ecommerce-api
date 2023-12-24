@@ -1,17 +1,16 @@
 package locations
 
 import (
+	"github.com/dangduoc08/ecommerce-api/locations/controllers"
+	"github.com/dangduoc08/ecommerce-api/locations/providers"
 	"github.com/dangduoc08/gooh/core"
 )
 
-var LocationModule = core.ModuleBuilder().
+var Module = core.ModuleBuilder().
 	Controllers(
-		LocationController{},
+		controllers.LocationREST{},
 	).
 	Providers(
-		LocationProvider{},
-	).
-	Exports(
-		LocationProvider{},
+		providers.LocationDB{},
 	).
 	Build()

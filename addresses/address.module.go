@@ -1,21 +1,16 @@
 package addresses
 
 import (
-	"github.com/dangduoc08/ecommerce-api/locations"
+	"github.com/dangduoc08/ecommerce-api/addresses/controllers"
+	"github.com/dangduoc08/ecommerce-api/addresses/providers"
 	"github.com/dangduoc08/gooh/core"
 )
 
-var AddressModule = core.ModuleBuilder().
-	Imports(
-		locations.LocationModule,
-	).
+var Module = core.ModuleBuilder().
 	Controllers(
-		AddressController{},
+		controllers.AddressREST{},
 	).
 	Providers(
-		AddressProvider{},
-	).
-	Exports(
-		AddressProvider{},
+		providers.AddressDB{},
 	).
 	Build()

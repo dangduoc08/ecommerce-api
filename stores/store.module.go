@@ -1,17 +1,16 @@
 package stores
 
 import (
+	"github.com/dangduoc08/ecommerce-api/stores/controllers"
+	"github.com/dangduoc08/ecommerce-api/stores/providers"
 	"github.com/dangduoc08/gooh/core"
 )
 
-var StoreModule = core.ModuleBuilder().
+var Module = core.ModuleBuilder().
 	Controllers(
-		StoreController{},
+		controllers.StoreREST{},
 	).
 	Providers(
-		StoreProvider{},
-	).
-	Exports(
-		StoreProvider{},
+		providers.StoreDB{},
 	).
 	Build()

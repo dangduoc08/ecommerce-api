@@ -1,15 +1,16 @@
 package groups
 
-import "github.com/dangduoc08/gooh/core"
+import (
+	"github.com/dangduoc08/ecommerce-api/groups/controllers"
+	"github.com/dangduoc08/ecommerce-api/groups/providers"
+	"github.com/dangduoc08/gooh/core"
+)
 
-var GroupModule = core.ModuleBuilder().
+var Module = core.ModuleBuilder().
 	Controllers(
-		GroupController{},
+		controllers.GroupREST{},
 	).
 	Providers(
-		GroupProvider{},
-	).
-	Exports(
-		GroupProvider{},
+		providers.GroupDB{},
 	).
 	Build()

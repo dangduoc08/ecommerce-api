@@ -4,14 +4,15 @@ import (
 	"fmt"
 
 	"github.com/dangduoc08/ecommerce-api/conf"
+	"github.com/dangduoc08/ecommerce-api/db/providers"
 	"github.com/dangduoc08/gooh/common"
 	"github.com/dangduoc08/gooh/core"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	// gormLogger "gorm.io/gorm/logger"
+	gormLogger "gorm.io/gorm/logger"
 )
 
-var DBModule = func(
+var Module = func(
 	logger common.Logger,
 ) *core.Module {
 
@@ -31,7 +32,7 @@ var DBModule = func(
 	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		// Logger: gormLogger.Default.LogMode(gormLogger.Info),
+		Logger: gormLogger.Default.LogMode(gormLogger.Silent),
 	})
 
 	if err != nil {
@@ -40,12 +41,12 @@ var DBModule = func(
 		logger.Info("PostgresSQL", "connected", true)
 	}
 
-	provider := DBProvider{
+	provider := providers.DB{
 		DB: db,
 	}
 
 	module := core.ModuleBuilder().
-		Exports(provider).
+		Providers(provider).
 		Build()
 
 	module.IsGlobal = true
