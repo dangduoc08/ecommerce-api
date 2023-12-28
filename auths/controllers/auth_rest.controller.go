@@ -21,16 +21,15 @@ import (
 type AuthREST struct {
 	common.REST
 	common.Guard
+	providers.AuthHandler
+	userProviders.UserDB
+	config.ConfigService
+	common.Logger
 
 	JWTAccessAPIExpIn    int
 	JWTAccessAPIKey      string
 	JWTRefreshTokenExpIn int
 	JWTRefreshTokenKey   string
-
-	AuthHandler   providers.AuthHandler
-	UserDB        userProviders.UserDB
-	ConfigService config.ConfigService
-	Logger        common.Logger
 }
 
 func (self AuthREST) NewController() core.Controller {
@@ -43,10 +42,10 @@ func (self AuthREST) NewController() core.Controller {
 		self.CREATE_tokens,
 	)
 
-	self.JWTAccessAPIKey = self.ConfigService.Get("JWT_ACCESS_API_KEY").(string)
-	self.JWTAccessAPIExpIn = self.ConfigService.Get("JWT_ACCESS_API_EXP_IN").(int)
-	self.JWTRefreshTokenKey = self.ConfigService.Get("JWT_REFRESH_TOKEN_KEY").(string)
-	self.JWTRefreshTokenExpIn = self.ConfigService.Get("JWT_REFRESH_TOKEN_EXP_IN").(int)
+	self.JWTAccessAPIKey = self.Get("JWT_ACCESS_API_KEY").(string)
+	self.JWTAccessAPIExpIn = self.Get("JWT_ACCESS_API_EXP_IN").(int)
+	self.JWTRefreshTokenKey = self.Get("JWT_REFRESH_TOKEN_KEY").(string)
+	self.JWTRefreshTokenExpIn = self.Get("JWT_REFRESH_TOKEN_EXP_IN").(int)
 
 	return self
 }
@@ -55,12 +54,12 @@ func (self AuthREST) CREATE_sessions(
 	c gooh.Context,
 	bodyDTO models.CREATE_sessions_Body,
 ) gooh.Map {
-	user, err := self.UserDB.FindOneBy(&userProviders.UserQuery{
+	user, err := self.FindOneBy(&userProviders.UserQuery{
 		Username: bodyDTO.Data.Username,
 	})
 
 	if err != nil {
-		self.Logger.Error(
+		self.Error(
 			"AuthREST.CREATE_sessions.UserDB.FindOneBy",
 			"message", err.Error(),
 			"X-Request-ID", c.GetID(),
@@ -73,13 +72,13 @@ func (self AuthREST) CREATE_sessions(
 		panic(exception.UnauthorizedException(fmt.Sprintf("user'status is %v", user.Status)))
 	}
 
-	if !self.AuthHandler.CheckHash(bodyDTO.Data.Password, user.Hash) {
+	if !self.CheckHash(bodyDTO.Data.Password, user.Hash) {
 		panic(exception.UnauthorizedException("password not match"))
 	}
 
-	permissions := self.AuthHandler.GetUserPermissions(user.Groups)
+	permissions := self.GetUserPermissions(user.Groups)
 
-	accessToken, err := self.AuthHandler.SignToken(
+	accessToken, err := self.SignToken(
 		jwt.MapClaims{
 			"id":          user.ID,
 			"store_id":    user.StoreID,
@@ -92,7 +91,7 @@ func (self AuthREST) CREATE_sessions(
 		self.JWTAccessAPIExpIn,
 	)
 	if err != nil {
-		self.Logger.Error(
+		self.Error(
 			"UserProvider.SignToken",
 			"message", err.Error(),
 			"X-Request-ID", c.GetID(),
@@ -100,7 +99,7 @@ func (self AuthREST) CREATE_sessions(
 		panic(exception.InternalServerErrorException(err.Error()))
 	}
 
-	refreshToken, err := self.AuthHandler.SignToken(
+	refreshToken, err := self.SignToken(
 		jwt.MapClaims{
 			"id":       user.ID,
 			"store_id": user.StoreID,
@@ -109,7 +108,7 @@ func (self AuthREST) CREATE_sessions(
 		self.JWTRefreshTokenExpIn,
 	)
 	if err != nil {
-		self.Logger.Error(
+		self.Error(
 			"UserProvider.SignToken",
 			"message", err.Error(),
 			"X-Request-ID", c.GetID(),
@@ -137,9 +136,9 @@ func (self AuthREST) CREATE_tokens(
 	tokenClaims := c.Request.Context().Value("tokenClaims").(jwt.MapClaims)
 	userID := uint(tokenClaims["id"].(float64))
 
-	user, err := self.UserDB.FindByID(userID)
+	user, err := self.FindByID(userID)
 	if err != nil {
-		self.Logger.Error(
+		self.Error(
 			"AuthREST.CREATE_tokens.UserDB.FindByID",
 			"message", err.Error(),
 			"X-Request-ID", c.GetID(),
@@ -152,9 +151,9 @@ func (self AuthREST) CREATE_tokens(
 		panic(exception.UnauthorizedException(fmt.Sprintf("user'status is %v", user.Status)))
 	}
 
-	permissions := self.AuthHandler.GetUserPermissions(user.Groups)
+	permissions := self.GetUserPermissions(user.Groups)
 
-	accessToken, err := self.AuthHandler.SignToken(
+	accessToken, err := self.SignToken(
 		jwt.MapClaims{
 			"id":          user.ID,
 			"store_id":    user.StoreID,
