@@ -4,6 +4,7 @@ import (
 	"github.com/dangduoc08/ecommerce-api/addresses"
 	"github.com/dangduoc08/ecommerce-api/assets"
 	"github.com/dangduoc08/ecommerce-api/auths"
+	"github.com/dangduoc08/ecommerce-api/categories"
 	"github.com/dangduoc08/ecommerce-api/conf"
 	"github.com/dangduoc08/ecommerce-api/db"
 	"github.com/dangduoc08/ecommerce-api/groups"
@@ -45,6 +46,7 @@ func main() {
 				assets.Module,
 				groups.Module,
 				permissions.Module,
+				categories.Module,
 			).
 			Build(),
 	)

@@ -10,7 +10,7 @@ import (
 )
 
 type DB struct {
-	DB *gorm.DB
+	*gorm.DB
 }
 
 func (dbProvider DB) NewProvider() core.Provider {

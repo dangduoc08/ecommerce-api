@@ -1,4 +1,4 @@
-package models
+package dtos
 
 import (
 	"fmt"
@@ -12,12 +12,15 @@ import (
 )
 
 type CREATE_Body_Data struct {
-	Name        string   `bind:"name" validate:"required"`
-	Permissions []string `bind:"permissions" validate:"permissions"`
+	Username  string `bind:"username" validate:"required,gte=6"`
+	Password  string `bind:"password" validate:"required,password"`
+	Email     string `bind:"email" validate:"required,email"`
+	FirstName string `bind:"first_name" validate:"required"`
+	LastName  string `bind:"last_name" validate:"required"`
+	GroupIDs  []uint `bind:"group_ids"`
 }
 
 type CREATE_Body struct {
-	common.REST
 	Data CREATE_Body_Data `bind:"data"`
 }
 
@@ -25,38 +28,25 @@ func (self CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	bindedBody, fls := body.Bind(self)
-	bodyDTO := bindedBody.(CREATE_Body)
+	bindedStruct, fls := body.Bind(self)
+	bodyDTO := bindedStruct.(CREATE_Body)
 
 	fieldMap := make(map[string]gooh.FieldLevel)
 	for _, fl := range fls {
 		fieldMap[fl.Field()] = fl
 	}
 
-	availablePermissions := []string{}
-	for _, restConfiguration := range self.GetConfigurations() {
-		availablePermissions = append(
-			availablePermissions,
-			restConfiguration.Method+restConfiguration.Route,
-		)
-	}
-
-	validate.RegisterValidation("permissions", validators.ValidateEnums(availablePermissions, func(fieldErr validator.FieldError) {
+	validate.RegisterValidation("password", validators.ValidatePassword(func(fieldErr validator.FieldError) {
 		if fieldErr != nil {
 			fl := fieldMap[fieldErr.Field()]
 			errMsgs = append(errMsgs, map[string]any{
 				"field": fl.Tag(),
-				"error": fmt.Sprintf("%v is invalid permission", fieldErr.Value()),
+				"error": fmt.Sprint("must be at least 8 characters including 1 upper case, 1 digit and 1 special character"),
 			})
 		}
 	}))
 
 	fieldErrs := validate.Struct(bodyDTO)
-
-	if len(bodyDTO.Data.Permissions) == 1 && bodyDTO.Data.Permissions[0] == "*" {
-		errMsgs = []map[string]any{}
-	}
-
 	if fieldErrs != nil {
 		for _, fieldErr := range fieldErrs.(validator.ValidationErrors) {
 			fl := fieldMap[fieldErr.Field()]
@@ -71,7 +61,7 @@ func (self CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata
 		panic(exception.UnprocessableEntityException(errMsgs))
 	}
 
-	bodyDTO.Data.Permissions = utils.ArrToUnique[string](bodyDTO.Data.Permissions)
+	bodyDTO.Data.GroupIDs = utils.ArrToUnique(bodyDTO.Data.GroupIDs)
 
 	return bodyDTO
 }

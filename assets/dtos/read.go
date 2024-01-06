@@ -5,7 +5,7 @@ import (
 
 	"github.com/dangduoc08/ecommerce-api/assets/providers"
 	"github.com/dangduoc08/ecommerce-api/constants"
-	"github.com/dangduoc08/ecommerce-api/utils"
+	"github.com/dangduoc08/ecommerce-api/validators"
 	"github.com/dangduoc08/gooh"
 	"github.com/dangduoc08/gooh/common"
 	"github.com/dangduoc08/gooh/exception"
@@ -34,7 +34,7 @@ func (self READ_Query) Transform(query gooh.Query, medata common.ArgumentMetadat
 
 	queryDTO := bindedStruct.(READ_Query)
 
-	validate.RegisterValidation("order", utils.ValidateEnum(constants.ORDERS, func(fieldErr validator.FieldError) {
+	validate.RegisterValidation("order", validators.ValidateEnum(constants.ORDERS, func(fieldErr validator.FieldError) {
 		if fieldErr != nil {
 			fl := fieldMap[fieldErr.Field()]
 			errMsgs = append(errMsgs, map[string]any{

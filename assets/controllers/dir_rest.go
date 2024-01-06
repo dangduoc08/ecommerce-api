@@ -69,7 +69,7 @@ func (self DirREST) DELETE(
 	}
 }
 
-func (self DirREST) MODIFY(
+func (self DirREST) MODIFY_names(
 	c gooh.Context,
 	bodyDTO dtos.MODIFY_Body,
 ) gooh.Map {

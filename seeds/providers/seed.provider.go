@@ -3,6 +3,7 @@ package providers
 import (
 	addressModels "github.com/dangduoc08/ecommerce-api/addresses/models"
 	authProviders "github.com/dangduoc08/ecommerce-api/auths/providers"
+	categoryModels "github.com/dangduoc08/ecommerce-api/categories/models"
 	"github.com/dangduoc08/ecommerce-api/constants"
 	dbProviders "github.com/dangduoc08/ecommerce-api/db/providers"
 	groupModels "github.com/dangduoc08/ecommerce-api/groups/models"
@@ -21,19 +22,22 @@ type Seed struct {
 	JWTAccessAPIKey    string
 	JWTRefreshTokenKey string
 
-	DBProvider    dbProviders.DB
-	ConfigService config.ConfigService
-	Logger        common.Logger
-	UserDB        userProviders.UserDB
-	LocationDB    locationProviders.LocationDB
-	StoreDB       storeProviders.StoreDB
-	AuthHandler   authProviders.AuthHandler
+	DBProvider     dbProviders.DB
+	ConfigService  config.ConfigService
+	Logger         common.Logger
+	UserDBHandler  userProviders.DBHandler
+	DBHandler      locationProviders.DBHandler
+	StoreDBHandler storeProviders.DBHandler
+	AuthDBHandler  authProviders.DBHandler
 }
 
 func (self Seed) NewProvider() core.Provider {
 
 	// Create user_status enum
 	self.DBProvider.CreateEnum(constants.USER_STATUS_FIELD_NAME, constants.USER_STATUSES)
+
+	// Create category_status enum
+	self.DBProvider.CreateEnum(constants.CATEGORY_STATUS_FIELD_NAME, constants.CATEGORY_STATUSES)
 
 	// Create tables
 	err := self.DBProvider.DB.AutoMigrate(&locationModels.Location{})
@@ -61,10 +65,15 @@ func (self Seed) NewProvider() core.Provider {
 		panic(err)
 	}
 
+	err = self.DBProvider.DB.AutoMigrate(&categoryModels.Category{})
+	if err != nil {
+		panic(err)
+	}
+
 	// Seed locations
 	totalLocations := self.DBProvider.Count(constants.TABLE_LOCATION)
 	if totalLocations == 0 {
-		self.LocationDB.Seed(func(locationRec locationModels.Location) {
+		self.DBHandler.Seed(func(locationRec locationModels.Location) {
 			resp := self.DBProvider.DB.Create(&locationRec)
 			if resp.Error != nil {
 				self.Logger.Debug("SeedLocations", "error", resp.Error)
@@ -73,7 +82,7 @@ func (self Seed) NewProvider() core.Provider {
 	}
 
 	// Seed users
-	hash, err := self.AuthHandler.HashPassword(self.ConfigService.Get("PASSWORD").(string))
+	hash, err := self.AuthDBHandler.HashPassword(self.ConfigService.Get("PASSWORD").(string))
 	if err != nil {
 		panic(err)
 	}

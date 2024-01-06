@@ -1,4 +1,4 @@
-package models
+package dtos
 
 import (
 	"fmt"
@@ -12,10 +12,11 @@ import (
 )
 
 type READ_Query struct {
-	Sort   string `bind:"sort"`
-	Order  string `bind:"order" validate:"order"`
-	Limit  int    `bind:"limit" validate:"gte=0,lte=100"`
-	Offset int    `bind:"offset" validate:"gte=0"`
+	Statuses []string `bind:"statuses" validate:"userStatus"`
+	Sort     string   `bind:"sort"`
+	Order    string   `bind:"order" validate:"order"`
+	Limit    int      `bind:"limit" validate:"gte=0,lte=100"`
+	Offset   int      `bind:"offset" validate:"gte=0"`
 }
 
 func (self READ_Query) Transform(query gooh.Query, medata common.ArgumentMetadata) any {
@@ -23,13 +24,22 @@ func (self READ_Query) Transform(query gooh.Query, medata common.ArgumentMetadat
 
 	validate := validator.New()
 	bindedStruct, fls := query.Bind(self)
+	queryDTO := bindedStruct.(READ_Query)
 
 	fieldMap := make(map[string]gooh.FieldLevel)
 	for _, fl := range fls {
 		fieldMap[fl.Field()] = fl
 	}
 
-	queryDTO := bindedStruct.(READ_Query)
+	validate.RegisterValidation("userStatus", validators.ValidateEnums(constants.USER_STATUSES, func(fieldErr validator.FieldError) {
+		if fieldErr != nil {
+			fl := fieldMap[fieldErr.Field()]
+			errMsgs = append(errMsgs, map[string]any{
+				"field": fl.Tag(),
+				"error": fmt.Sprintf("%v is invalid status", fieldErr.Value()),
+			})
+		}
+	}))
 
 	validate.RegisterValidation("order", validators.ValidateEnum(constants.ORDERS, func(fieldErr validator.FieldError) {
 		if fieldErr != nil {

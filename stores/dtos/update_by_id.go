@@ -1,9 +1,8 @@
-package models
+package dtos
 
 import (
 	"fmt"
 
-	"github.com/dangduoc08/ecommerce-api/utils"
 	"github.com/dangduoc08/ecommerce-api/validators"
 	"github.com/dangduoc08/gooh"
 	"github.com/dangduoc08/gooh/common"
@@ -12,21 +11,47 @@ import (
 )
 
 type UPDATE_BY_id_Param struct {
-	ID uint `bind:"id"`
+	ID uint `bind:"id" validate:"required"`
 }
 
 func (self UPDATE_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
-	paramDTO, _ := param.Bind(self)
+	errMsgs := []map[string]any{}
+
+	validate := validator.New()
+	paramDTO, fls := param.Bind(self)
+
+	fieldMap := make(map[string]gooh.FieldLevel)
+	for _, fl := range fls {
+		fieldMap[fl.Field()] = fl
+	}
+
+	fieldErrs := validate.Struct(paramDTO)
+
+	if fieldErrs != nil {
+		for _, fieldErr := range fieldErrs.(validator.ValidationErrors) {
+			fl := fieldMap[fieldErr.Field()]
+			errMsgs = append(errMsgs, map[string]any{
+				"field": fl.Tag(),
+				"error": fmt.Sprintf("must be %v", fieldErr.Tag()),
+			})
+		}
+	}
+
+	if len(errMsgs) > 0 {
+		panic(exception.UnprocessableEntityException(errMsgs))
+	}
+
 	return paramDTO
 }
 
 type UPDATE_BY_id_Body_Data struct {
-	Name        string   `bind:"name" validate:"required"`
-	Permissions []string `bind:"permissions" validate:"permissions"`
+	Name        string `bind:"name" validate:"required,lte=130"`
+	Description string `bind:"description"`
+	Phone       string `bind:"phone" validate:"phone"`
+	Email       string `bind:"email" validate:"omitempty,email"`
 }
 
 type UPDATE_BY_id_Body struct {
-	common.REST
 	Data UPDATE_BY_id_Body_Data `bind:"data"`
 }
 
@@ -42,28 +67,17 @@ func (self UPDATE_BY_id_Body) Transform(body gooh.Body, medata common.ArgumentMe
 		fieldMap[fl.Field()] = fl
 	}
 
-	availablePermissions := []string{}
-	for _, restConfiguration := range self.GetConfigurations() {
-		availablePermissions = append(
-			availablePermissions,
-			restConfiguration.Method+restConfiguration.Route,
-		)
-	}
-
-	validate.RegisterValidation("permissions", validators.ValidateEnums(availablePermissions, func(fieldErr validator.FieldError) {
+	validate.RegisterValidation("phone", validators.ValidatePhone("VN", func(fieldErr validator.FieldError) {
 		if fieldErr != nil {
 			fl := fieldMap[fieldErr.Field()]
 			errMsgs = append(errMsgs, map[string]any{
 				"field": fl.Tag(),
-				"error": fmt.Sprintf("%v is invalid permission", fieldErr.Value()),
+				"error": fmt.Sprintf("%v is invalid phone format", fieldErr.Value()),
 			})
 		}
 	}))
 
 	fieldErrs := validate.Struct(bodyDTO)
-	if len(bodyDTO.Data.Permissions) == 1 && bodyDTO.Data.Permissions[0] == "*" {
-		errMsgs = []map[string]any{}
-	}
 
 	if fieldErrs != nil {
 		for _, fieldErr := range fieldErrs.(validator.ValidationErrors) {
@@ -78,8 +92,6 @@ func (self UPDATE_BY_id_Body) Transform(body gooh.Body, medata common.ArgumentMe
 	if len(errMsgs) > 0 {
 		panic(exception.UnprocessableEntityException(errMsgs))
 	}
-
-	bodyDTO.Data.Permissions = utils.ArrToUnique[string](bodyDTO.Data.Permissions)
 
 	return bodyDTO
 }

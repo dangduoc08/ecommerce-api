@@ -1,9 +1,8 @@
-package models
+package dtos
 
 import (
 	"fmt"
 
-	"github.com/dangduoc08/ecommerce-api/constants"
 	"github.com/dangduoc08/ecommerce-api/validators"
 	"github.com/dangduoc08/gooh"
 	"github.com/dangduoc08/gooh/common"
@@ -11,38 +10,38 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type READ_Query struct {
-	Sort   string `bind:"sort"`
-	Order  string `bind:"order" validate:"order"`
-	Limit  int    `bind:"limit" validate:"gte=0,lte=100"`
-	Offset int    `bind:"offset" validate:"gte=0"`
+type CREATE_sessions_Body_Data struct {
+	Username string `bind:"username" validate:"required,gte=6"`
+	Password string `bind:"password" validate:"required,password"`
 }
 
-func (self READ_Query) Transform(query gooh.Query, medata common.ArgumentMetadata) any {
+type CREATE_sessions_Body struct {
+	Data CREATE_sessions_Body_Data `bind:"data"`
+}
+
+func (self CREATE_sessions_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	bindedStruct, fls := query.Bind(self)
+	bindedStruct, fls := body.Bind(self)
+	bodyDTO := bindedStruct.(CREATE_sessions_Body)
 
 	fieldMap := make(map[string]gooh.FieldLevel)
 	for _, fl := range fls {
 		fieldMap[fl.Field()] = fl
 	}
 
-	queryDTO := bindedStruct.(READ_Query)
-
-	validate.RegisterValidation("order", validators.ValidateEnum(constants.ORDERS, func(fieldErr validator.FieldError) {
+	validate.RegisterValidation("password", validators.ValidatePassword(func(fieldErr validator.FieldError) {
 		if fieldErr != nil {
 			fl := fieldMap[fieldErr.Field()]
 			errMsgs = append(errMsgs, map[string]any{
 				"field": fl.Tag(),
-				"error": fmt.Sprintf("%v not in %v", fieldErr.Value(), fieldErr.Param()),
+				"error": fmt.Sprint("must be at least 8 characters including 1 upper case, 1 digit and 1 special character"),
 			})
 		}
 	}))
 
-	fieldErrs := validate.Struct(queryDTO)
-
+	fieldErrs := validate.Struct(bodyDTO)
 	if fieldErrs != nil {
 		for _, fieldErr := range fieldErrs.(validator.ValidationErrors) {
 			fl := fieldMap[fieldErr.Field()]
@@ -57,5 +56,5 @@ func (self READ_Query) Transform(query gooh.Query, medata common.ArgumentMetadat
 		panic(exception.UnprocessableEntityException(errMsgs))
 	}
 
-	return queryDTO
+	return bodyDTO
 }
