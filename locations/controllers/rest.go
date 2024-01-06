@@ -25,7 +25,7 @@ func (self REST) NewController() core.Controller {
 }
 
 func (self REST) READ(
-	c gooh.Context,
+	ctx gooh.Context,
 	query gooh.Query,
 ) []*models.Location {
 	var locationID *uint
@@ -45,7 +45,7 @@ func (self REST) READ(
 		self.Logger.Debug(
 			"READ.FindManyBy",
 			"error", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		return []*models.Location{}
 	}

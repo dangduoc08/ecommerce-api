@@ -1,6 +1,6 @@
 package providers
 
-type UserQuery struct {
+type Query struct {
 	Username string
 	Email    string
 	StoreID  uint
@@ -11,7 +11,7 @@ type UserQuery struct {
 	Offset   int
 }
 
-type UserCreation struct {
+type Creation struct {
 	StoreID   uint
 	Password  string
 	Username  string

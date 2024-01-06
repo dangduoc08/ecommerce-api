@@ -21,7 +21,7 @@ type REST struct {
 	common.Guard
 	common.Interceptor
 	common.Logger
-	DBHandler         providers.DBHandler
+	providers.DBHandler
 	CategoryDBHandler categoryProviders.DBHandler
 	AddressDBHandler  addressProviders.DBHandler
 }
@@ -31,14 +31,15 @@ func (self REST) NewController() core.Controller {
 		Prefix("v1").
 		Prefix("stores")
 
-	self.BindGuard(
-		shared.AuthGuard{},
-		self.UPDATE_BY_id,
-	)
+	self.
+		BindGuard(
+			shared.AuthGuard{},
+			self.UPDATE_BY_id,
+		)
 
 	self.
 		BindInterceptor(
-			categoryInterceptors.ChildCategoryTransformation{},
+			categoryInterceptors.SubCategoryTransformation{},
 			self.READ_categories_OF_BY_id,
 		).
 		BindInterceptor(
@@ -50,15 +51,15 @@ func (self REST) NewController() core.Controller {
 }
 
 func (self REST) READ_BY_id(
-	c gooh.Context,
+	ctx gooh.Context,
 	paramDTO dtos.READ_BY_id_Param,
 ) *models.Store {
-	store, err := self.DBHandler.FindByID(paramDTO.ID)
+	store, err := self.FindByID(paramDTO.ID)
 	if err != nil {
 		self.Debug(
 			"READ_BY_id.FindByID",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		panic(exception.NotFoundException(err.Error()))
 	}
@@ -67,7 +68,7 @@ func (self REST) READ_BY_id(
 }
 
 func (self REST) READ_categories_OF_BY_id(
-	c gooh.Context,
+	ctx gooh.Context,
 	paramDTO dtos.READ_categories_OF_BY_id_Param,
 	queryDTO dtos.READ_categories_OF_BY_id_Query,
 ) *[]map[string]any {
@@ -80,7 +81,7 @@ func (self REST) READ_categories_OF_BY_id(
 		self.Debug(
 			"READ_categories_OF_BY_id.FindManyAsMenu",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		return &[]map[string]any{}
 	}
@@ -89,7 +90,7 @@ func (self REST) READ_categories_OF_BY_id(
 }
 
 func (self REST) READ_addresses_OF_BY_id(
-	c gooh.Context,
+	ctx gooh.Context,
 	paramDTO dtos.READ_addresses_OF_BY_id_Param,
 	queryDTO dtos.READ_addresses_OF_BY_id_Query,
 ) []*addressModels.Address {
@@ -105,7 +106,7 @@ func (self REST) READ_addresses_OF_BY_id(
 		self.Debug(
 			"READ_addresses_OF_BY_id.AddressDBHandler.FindManyBy",
 			"error", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		return []*addressModels.Address{}
 	}
@@ -114,32 +115,32 @@ func (self REST) READ_addresses_OF_BY_id(
 }
 
 func (self REST) UPDATE_BY_id(
-	c gooh.Context,
+	ctx gooh.Context,
 	paramDTO dtos.UPDATE_BY_id_Param,
 	bodyDTO dtos.UPDATE_BY_id_Body,
 ) *models.Store {
-	store, err := self.DBHandler.FindByID(paramDTO.ID)
+	store, err := self.FindByID(paramDTO.ID)
 	if err != nil {
 		self.Debug(
 			"UPDATE_BY_id.FindByID",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		panic(exception.NotFoundException(err.Error()))
 	}
 
-	store, err = self.DBHandler.UpdateByID(paramDTO.ID, &providers.Update{
+	store, err = self.UpdateByID(paramDTO.ID, &providers.Update{
 		Name:        bodyDTO.Data.Name,
-		Description: bodyDTO.Data.Description,
-		Phone:       bodyDTO.Data.Phone,
-		Email:       bodyDTO.Data.Email,
+		Description: &bodyDTO.Data.Description,
+		Phone:       &bodyDTO.Data.Phone,
+		Email:       &bodyDTO.Data.Email,
 	})
 
 	if err != nil {
 		self.Debug(
 			"UPDATE_BY_id.UpdateByID",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		panic(exception.InternalServerErrorException(err.Error()))
 	}

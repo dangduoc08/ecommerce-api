@@ -12,7 +12,7 @@ import (
 )
 
 type CREATE_dirs_Body_Data struct {
-	Name string `bind:"name" validate:"required"`
+	Dir string `bind:"dir" validate:"required"`
 }
 
 type CREATE_dirs_Body struct {
@@ -26,7 +26,7 @@ func (self CREATE_dirs_Body) Transform(body gooh.Body, medata common.ArgumentMet
 	validate := validator.New()
 	dto, fls := body.Bind(self)
 	bodyDTO := dto.(CREATE_dirs_Body)
-	bodyDTO.Data.Name = strings.TrimSpace(bodyDTO.Data.Name)
+	bodyDTO.Data.Dir = strings.TrimSpace(bodyDTO.Data.Dir)
 
 	fieldMap := make(map[string]gooh.FieldLevel)
 	for _, fl := range fls {
@@ -49,7 +49,7 @@ func (self CREATE_dirs_Body) Transform(body gooh.Body, medata common.ArgumentMet
 		panic(exception.UnprocessableEntityException(errMsgs))
 	}
 
-	bodyDTO.Data.Name = self.CleanDir(bodyDTO.Data.Name)
+	bodyDTO.Data.Dir = self.CleanDir(bodyDTO.Data.Dir)
 
 	return bodyDTO
 }

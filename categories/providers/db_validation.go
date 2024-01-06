@@ -1,6 +1,7 @@
 package providers
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/dangduoc08/ecommerce-api/categories/models"
@@ -35,4 +36,27 @@ func (self DBValidation) CheckParentCategories(parentCategoryIDs []uint) ([]*mod
 	}
 
 	return categoryRecs, nil
+}
+
+func (self DBValidation) CheckCategoryRelationship(categoryID uint, parentCategoryIDs []uint) error {
+	for _, parentCategoryID := range parentCategoryIDs {
+		if categoryID == parentCategoryID {
+			return errors.New(fmt.Sprintf("Circular relationship are not allowed"))
+		}
+
+		categoryCategoryRecs := []*models.CategoryCategory{}
+		self.Raw("SELECT * FROM categories_categories WHERE category_id = ?", parentCategoryID).Scan(&categoryCategoryRecs)
+
+		for _, categoryCategoryRec := range categoryCategoryRecs {
+			if categoryID == categoryCategoryRec.ParentCategoryID {
+				return errors.New(fmt.Sprintf("Circular relationship are not allowed"))
+			}
+
+			if categoryCategoryRec.CategoryID != 0 && categoryCategoryRec.ParentCategoryID != 0 {
+				return self.CheckCategoryRelationship(categoryID, []uint{categoryCategoryRec.ParentCategoryID})
+			}
+		}
+	}
+
+	return nil
 }

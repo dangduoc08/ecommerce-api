@@ -16,9 +16,9 @@ type Query struct {
 type Creation struct {
 	StoreID           uint
 	Name              string
-	Description       string
+	Description       *string
 	MetaTitle         string
-	MetaDescription   string
+	MetaDescription   *string
 	Slug              string
 	Status            models.CategoryStatus
 	ParentCategoryIDs []uint
@@ -28,9 +28,9 @@ type Update struct {
 	ID                uint
 	StoreID           uint
 	Name              string
-	Description       string
+	Description       *string
 	MetaTitle         string
-	MetaDescription   string
+	MetaDescription   *string
 	Slug              string
 	Status            models.CategoryStatus
 	ParentCategoryIDs []uint

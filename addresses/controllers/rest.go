@@ -26,33 +26,29 @@ func (self REST) NewController() core.Controller {
 		Prefix("addresses")
 
 	self.
-		BindGuard(
-			shared.AuthGuard{},
-		)
+		BindGuard(shared.AuthGuard{})
 
 	self.
-		BindInterceptor(
-			interceptors.AddressLocationTransformation{},
-		)
+		BindInterceptor(interceptors.AddressLocationTransformation{})
 
 	return self
 }
 
 func (self REST) READ_BY_id(
-	c gooh.Context,
-	accessTokenPayloadDTO shared.AccessTokenPayloadDTO,
+	ctx gooh.Context,
+	tokenClaimsDTO shared.TokenClaimsDTO,
 	paramDTO dtos.READ_BY_id_Param,
 ) *models.Address {
 	address, err := self.FindOneBy(&providers.Query{
 		ID:      paramDTO.ID,
-		StoreID: accessTokenPayloadDTO.StoreID,
+		StoreID: tokenClaimsDTO.StoreID,
 	})
 
 	if err != nil {
 		self.Debug(
 			"READ_BY_id.FindOneBy",
 			"error", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		return nil
 	}
@@ -61,13 +57,13 @@ func (self REST) READ_BY_id(
 }
 
 func (self REST) CREATE(
-	c gooh.Context,
-	accessTokenPayloadDTO shared.AccessTokenPayloadDTO,
+	ctx gooh.Context,
+	tokenClaimsDTO shared.TokenClaimsDTO,
 	dto dtos.CREATE_Body,
 ) *models.Address {
 	dataCreation := &providers.Creation{
-		StoreID:    accessTokenPayloadDTO.StoreID,
-		StreetName: dto.Data.StreetName,
+		StoreID:    tokenClaimsDTO.StoreID,
+		StreetName: &dto.Data.StreetName,
 		LocationID: &dto.Data.LocationID,
 	}
 	if dto.Data.LocationID == 0 {
@@ -80,7 +76,7 @@ func (self REST) CREATE(
 		self.Debug(
 			"CREATE.CreateOne",
 			"error", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		panic(exception.UnprocessableEntityException(err.Error()))
 	}
@@ -89,14 +85,14 @@ func (self REST) CREATE(
 }
 
 func (self REST) UPDATE_BY_id(
-	c gooh.Context,
-	accessTokenPayloadDTO shared.AccessTokenPayloadDTO,
+	ctx gooh.Context,
+	tokenClaimsDTO shared.TokenClaimsDTO,
 	paramDTO dtos.UPDATE_BY_id_Param,
 	bodyDTO dtos.UPDATE_BY_id_Body,
 ) *models.Address {
 	address, err := self.FindOneBy(&providers.Query{
 		ID:      paramDTO.ID,
-		StoreID: accessTokenPayloadDTO.StoreID,
+		StoreID: tokenClaimsDTO.StoreID,
 	})
 
 	if err != nil {
@@ -104,8 +100,8 @@ func (self REST) UPDATE_BY_id(
 	}
 
 	dataUpdate := &providers.Update{
-		StoreID:    accessTokenPayloadDTO.StoreID,
-		StreetName: bodyDTO.Data.StreetName,
+		StoreID:    tokenClaimsDTO.StoreID,
+		StreetName: &bodyDTO.Data.StreetName,
 		LocationID: &bodyDTO.Data.LocationID,
 	}
 	if bodyDTO.Data.LocationID == 0 {
@@ -117,7 +113,7 @@ func (self REST) UPDATE_BY_id(
 		self.Debug(
 			"UPDATE_BY_id.CreateOne",
 			"error", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		panic(exception.UnprocessableEntityException(err.Error()))
 	}
@@ -126,20 +122,20 @@ func (self REST) UPDATE_BY_id(
 }
 
 func (self REST) DELETE_BY_id(
-	c gooh.Context,
-	accessTokenPayloadDTO shared.AccessTokenPayloadDTO,
+	ctx gooh.Context,
+	tokenClaimsDTO shared.TokenClaimsDTO,
 	paramDTO dtos.DELETE_BY_id_Param,
 ) gooh.Map {
 	_, err := self.FindOneBy(&providers.Query{
 		ID:      paramDTO.ID,
-		StoreID: accessTokenPayloadDTO.StoreID,
+		StoreID: tokenClaimsDTO.StoreID,
 	})
 
 	if err != nil {
 		self.Debug(
 			"DELETE_BY_id.FindOneBy",
 			"error", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		return gooh.Map{
 			"deleted": false,
@@ -150,7 +146,7 @@ func (self REST) DELETE_BY_id(
 		self.Debug(
 			"DELETE_BY_id.DeleteByID",
 			"error", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		return gooh.Map{
 			"deleted": false,

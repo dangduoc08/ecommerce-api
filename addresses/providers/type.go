@@ -11,12 +11,12 @@ type Query struct {
 
 type Creation struct {
 	StoreID    uint
-	StreetName string
+	StreetName *string
 	LocationID *uint
 }
 
 type Update struct {
 	StoreID    uint
-	StreetName string
+	StreetName *string
 	LocationID *uint
 }

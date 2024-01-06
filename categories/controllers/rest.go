@@ -25,20 +25,18 @@ func (self REST) NewController() core.Controller {
 		Prefix("categories")
 
 	self.
-		BindGuard(
-			shared.AuthGuard{},
-		)
+		BindGuard(shared.AuthGuard{})
 
 	return self
 }
 
 func (self REST) READ(
-	c gooh.Context,
-	accessTokenPayloadDTO shared.AccessTokenPayloadDTO,
+	ctx gooh.Context,
+	tokenClaimsDTO shared.TokenClaimsDTO,
 	queryDTO dtos.READ_Query,
 ) any {
 	categories, err := self.FindManyBy(&providers.Query{
-		StoreID: accessTokenPayloadDTO.StoreID,
+		StoreID: tokenClaimsDTO.StoreID,
 		Status:  models.CategoryStatus(queryDTO.Status),
 		Sort:    queryDTO.Sort,
 		Order:   queryDTO.Order,
@@ -48,9 +46,9 @@ func (self REST) READ(
 
 	if err != nil {
 		self.Logger.Debug(
-			"REST.READ.FindManyBy",
+			"READ.FindManyBy",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 
 		return []*models.Category{}
@@ -60,17 +58,17 @@ func (self REST) READ(
 }
 
 func (self REST) READ_BY_id(
-	c gooh.Context,
+	ctx gooh.Context,
 	paramDTO dtos.READ_BY_id_Param,
-	accessTokenPayloadDTO shared.AccessTokenPayloadDTO,
+	tokenClaimsDTO shared.TokenClaimsDTO,
 ) *models.Category {
 	category, err := self.FindByID(paramDTO.ID)
 
 	if err != nil {
 		self.Logger.Debug(
-			"REST.READ_BY_id.FindByID",
+			"READ_BY_id.FindByID",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		return nil
 	}
@@ -79,16 +77,16 @@ func (self REST) READ_BY_id(
 }
 
 func (self REST) CREATE(
-	c gooh.Context,
+	ctx gooh.Context,
 	bodyDTO dtos.CREATE_Body,
-	accessTokenPayloadDTO shared.AccessTokenPayloadDTO,
+	tokenClaimsDTO shared.TokenClaimsDTO,
 ) *models.Category {
 	category, err := self.CreateOne(&providers.Creation{
 		Name:              bodyDTO.Data.Name,
-		Description:       bodyDTO.Data.Description,
-		StoreID:           accessTokenPayloadDTO.StoreID,
+		Description:       &bodyDTO.Data.Description,
+		StoreID:           tokenClaimsDTO.StoreID,
 		MetaTitle:         bodyDTO.Data.MetaTitle,
-		MetaDescription:   bodyDTO.Data.MetaDescription,
+		MetaDescription:   &bodyDTO.Data.MetaDescription,
 		Slug:              bodyDTO.Data.Slug,
 		Status:            models.CategoryStatus(bodyDTO.Data.Status),
 		ParentCategoryIDs: bodyDTO.Data.ParentCategoryIDs,
@@ -96,9 +94,9 @@ func (self REST) CREATE(
 
 	if err != nil {
 		self.Debug(
-			"REST.CREATE.CreateOne",
+			"CREATE.CreateOne",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		panic(exception.InternalServerErrorException(err.Error()))
 	}
@@ -107,14 +105,14 @@ func (self REST) CREATE(
 }
 
 func (self REST) UPDATE_BY_id(
-	c gooh.Context,
+	ctx gooh.Context,
 	paramDTO dtos.UPDATE_BY_id_Param,
 	bodyDTO dtos.UPDATE_BY_id_Body,
-	accessTokenPayloadDTO shared.AccessTokenPayloadDTO,
+	tokenClaimsDTO shared.TokenClaimsDTO,
 ) *models.Category {
 	_, err := self.FindOneBy(&providers.Query{
 		ID:      paramDTO.ID,
-		StoreID: accessTokenPayloadDTO.StoreID,
+		StoreID: tokenClaimsDTO.StoreID,
 	})
 
 	if err != nil {
@@ -122,11 +120,11 @@ func (self REST) UPDATE_BY_id(
 	}
 
 	category, err := self.UpdateByID(paramDTO.ID, &providers.Update{
-		StoreID:           accessTokenPayloadDTO.StoreID,
+		StoreID:           tokenClaimsDTO.StoreID,
 		Name:              bodyDTO.Data.Name,
-		Description:       bodyDTO.Data.Description,
+		Description:       &bodyDTO.Data.Description,
 		MetaTitle:         bodyDTO.Data.MetaTitle,
-		MetaDescription:   bodyDTO.Data.MetaDescription,
+		MetaDescription:   &bodyDTO.Data.MetaDescription,
 		Slug:              bodyDTO.Data.Slug,
 		Status:            models.CategoryStatus(bodyDTO.Data.Status),
 		ParentCategoryIDs: bodyDTO.Data.ParentCategoryIDs,
@@ -134,35 +132,12 @@ func (self REST) UPDATE_BY_id(
 
 	if err != nil {
 		self.Logger.Debug(
-			"REST.UPDATE_BY_id.UpdateByID",
+			"UPDATE_BY_id.UpdateByID",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		panic(exception.InternalServerErrorException(err.Error()))
 	}
 
 	return category
-}
-
-func (self REST) DELETE_BY_id(
-	c gooh.Context,
-	// bodyDTO models.CREATE_Body,
-	accessTokenPayloadDTO shared.AccessTokenPayloadDTO,
-) *models.Category {
-	// group, err := self.GroupDB.CreateOne(&providers.GroupCreation{
-	// 	Name:        bodyDTO.Data.Name,
-	// 	Permissions: bodyDTO.Data.Permissions,
-	// 	StoreID:     accessTokenPayloadDTO.StoreID,
-	// })
-
-	// if err != nil {
-	// 	self.Logger.Debug(
-	// 		"GroupREST.CREATE.GroupDB.CreateOne",
-	// 		"message", err.Error(),
-	// 		"X-Request-ID", c.GetID(),
-	// 	)
-	// 	panic(exception.InternalServerErrorException(err.Error()))
-	// }
-
-	return nil
 }

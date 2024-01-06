@@ -9,6 +9,7 @@ import (
 	groupModels "github.com/dangduoc08/ecommerce-api/groups/models"
 	locationModels "github.com/dangduoc08/ecommerce-api/locations/models"
 	locationProviders "github.com/dangduoc08/ecommerce-api/locations/providers"
+	manufacturerModels "github.com/dangduoc08/ecommerce-api/manufacturers/models"
 	storeModels "github.com/dangduoc08/ecommerce-api/stores/models"
 	storeProviders "github.com/dangduoc08/ecommerce-api/stores/providers"
 	userModels "github.com/dangduoc08/ecommerce-api/users/models"
@@ -19,62 +20,66 @@ import (
 )
 
 type Seed struct {
+	dbProviders.DB
+	config.ConfigService
+	common.Logger
 	JWTAccessAPIKey    string
 	JWTRefreshTokenKey string
-
-	DBProvider     dbProviders.DB
-	ConfigService  config.ConfigService
-	Logger         common.Logger
-	UserDBHandler  userProviders.DBHandler
-	DBHandler      locationProviders.DBHandler
-	StoreDBHandler storeProviders.DBHandler
-	AuthDBHandler  authProviders.DBHandler
+	UserDBHandler      userProviders.DBHandler
+	LocationDBHandler  locationProviders.DBHandler
+	StoreDBHandler     storeProviders.DBHandler
+	AuthCipher         authProviders.Cipher
 }
 
 func (self Seed) NewProvider() core.Provider {
 
 	// Create user_status enum
-	self.DBProvider.CreateEnum(constants.USER_STATUS_FIELD_NAME, constants.USER_STATUSES)
+	self.CreateEnum(constants.USER_STATUS_FIELD_NAME, constants.USER_STATUSES)
 
 	// Create category_status enum
-	self.DBProvider.CreateEnum(constants.CATEGORY_STATUS_FIELD_NAME, constants.CATEGORY_STATUSES)
+	self.CreateEnum(constants.CATEGORY_STATUS_FIELD_NAME, constants.CATEGORY_STATUSES)
 
 	// Create tables
-	err := self.DBProvider.DB.AutoMigrate(&locationModels.Location{})
+	err := self.AutoMigrate(&locationModels.Location{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = self.DBProvider.DB.AutoMigrate(&addressModels.Address{})
+	err = self.AutoMigrate(&addressModels.Address{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = self.DBProvider.DB.AutoMigrate(&storeModels.Store{})
+	err = self.AutoMigrate(&storeModels.Store{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = self.DBProvider.DB.AutoMigrate(&groupModels.Group{})
+	err = self.AutoMigrate(&groupModels.Group{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = self.DBProvider.DB.AutoMigrate(&userModels.User{})
+	err = self.AutoMigrate(&userModels.User{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = self.DBProvider.DB.AutoMigrate(&categoryModels.Category{})
+	err = self.AutoMigrate(&categoryModels.Category{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = self.AutoMigrate(&manufacturerModels.Manufacturer{})
 	if err != nil {
 		panic(err)
 	}
 
 	// Seed locations
-	totalLocations := self.DBProvider.Count(constants.TABLE_LOCATION)
+	totalLocations := self.Count(constants.TABLE_LOCATION)
 	if totalLocations == 0 {
-		self.DBHandler.Seed(func(locationRec locationModels.Location) {
-			resp := self.DBProvider.DB.Create(&locationRec)
+		self.LocationDBHandler.Seed(func(locationRec locationModels.Location) {
+			resp := self.Create(&locationRec)
 			if resp.Error != nil {
 				self.Logger.Debug("SeedLocations", "error", resp.Error)
 			}
@@ -82,7 +87,7 @@ func (self Seed) NewProvider() core.Provider {
 	}
 
 	// Seed users
-	hash, err := self.AuthDBHandler.HashPassword(self.ConfigService.Get("PASSWORD").(string))
+	hash, err := self.AuthCipher.HashPassword(self.ConfigService.Get("PASSWORD").(string))
 	if err != nil {
 		panic(err)
 	}
@@ -103,14 +108,12 @@ func (self Seed) NewProvider() core.Provider {
 	}
 
 	// Seed stores
-	totalStores := self.DBProvider.Count(constants.TABLE_STORE)
+	totalStores := self.Count(constants.TABLE_STORE)
 	if totalStores == 0 {
-		resp := self.DBProvider.DB.Create(&storeModels.Store{
-			Name:        "Demo",
-			Description: "Demo shop",
-			Email:       self.ConfigService.Get("EMAIL").(string),
-			Addresses:   []addressModels.Address{},
-			Users:       []userModels.User{user},
+		resp := self.Create(&storeModels.Store{
+			Name:      "Demo",
+			Addresses: []addressModels.Address{},
+			Users:     []userModels.User{user},
 		})
 		if resp.Error != nil {
 			self.Logger.Debug("SeedStores", "error", resp.Error)

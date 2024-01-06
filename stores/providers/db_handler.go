@@ -8,7 +8,7 @@ import (
 )
 
 type DBHandler struct {
-	DBProvider dbProviders.DB
+	dbProviders.DB
 }
 
 func (self DBHandler) NewProvider() core.Provider {
@@ -20,7 +20,7 @@ func (self DBHandler) FindByID(
 ) (*models.Store, error) {
 	storeRec := &models.Store{ID: id}
 
-	if err := self.DBProvider.DB.Take(storeRec).Error; err != nil {
+	if err := self.Take(storeRec).Error; err != nil {
 		return nil, err
 	}
 
@@ -36,7 +36,7 @@ func (self DBHandler) UpdateByID(id uint, data *Update) (*models.Store, error) {
 		Email:       data.Email,
 	}
 
-	if err := self.DBProvider.DB.
+	if err := self.
 		Clauses(clause.Returning{}).
 		Updates(&storeRec).
 		Error; err != nil {

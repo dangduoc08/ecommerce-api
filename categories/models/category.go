@@ -13,12 +13,17 @@ type Category struct {
 	StoreID          uint              `json:"-"  gorm:"not null"`
 	Store            storeModels.Store `json:"-" gorm:"foreignKey:StoreID"`
 	Name             string            `json:"name" gorm:"not null"`
-	Description      string            `json:"description"`
+	Description      *string           `json:"description"`
 	MetaTitle        string            `json:"meta_title" gorm:"not null"`
-	MetaDescription  string            `json:"meta_description"`
+	MetaDescription  *string           `json:"meta_description"`
 	Slug             string            `json:"slug" gorm:"unique;not null"`
 	Status           CategoryStatus    `json:"status" gorm:"not null;type:category_status;default:disabled"`
 	ParentCategories []*Category       `json:"parent_categories" gorm:"many2many:categories_categories"`
 	CreatedAt        time.Time         `json:"created_at" gorm:"autoCreateTime:true"`
 	UpdatedAt        time.Time         `json:"updated_at" gorm:"autoUpdateTime:true"`
+}
+
+type CategoryCategory struct {
+	CategoryID       uint
+	ParentCategoryID uint
 }

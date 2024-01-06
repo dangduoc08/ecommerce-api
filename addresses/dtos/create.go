@@ -1,6 +1,8 @@
 package dtos
 
 import (
+	"strings"
+
 	"github.com/dangduoc08/gooh"
 	"github.com/dangduoc08/gooh/common"
 )
@@ -15,6 +17,10 @@ type CREATE_Body struct {
 }
 
 func (self CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
-	bodyDTO, _ := body.Bind(self)
+	bindedBody, _ := body.Bind(self)
+	bodyDTO := bindedBody.(CREATE_Body)
+
+	bodyDTO.Data.StreetName = strings.TrimSpace(bodyDTO.Data.StreetName)
+
 	return bodyDTO
 }

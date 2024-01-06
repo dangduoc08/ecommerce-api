@@ -12,8 +12,8 @@ import (
 )
 
 type DBHandler struct {
-	DBProvider    dbProviders.DB
-	ConfigService config.ConfigService
+	dbProviders.DB
+	config.ConfigService
 }
 
 func (self DBHandler) NewProvider() core.Provider {
@@ -22,7 +22,7 @@ func (self DBHandler) NewProvider() core.Provider {
 
 func (self DBHandler) Seed(cb func(models.Location)) {
 	dir, _ := os.Getwd()
-	data, err := os.ReadFile(fmt.Sprintf("%v/seeds/data/%v", dir, "locations.json"))
+	data, err := os.ReadFile(fmt.Sprintf("%v/seeds/datas/%v", dir, "locations.json"))
 	var locationList []map[string]any
 	err = json.Unmarshal(data, &locationList)
 	if err != nil {
@@ -61,7 +61,7 @@ func (self DBHandler) FindByID(id uint) (*models.Location, error) {
 		ID: id,
 	}
 
-	resp := self.DBProvider.DB.First(locationRec)
+	resp := self.First(locationRec)
 
 	return locationRec, resp.Error
 }
@@ -69,7 +69,7 @@ func (self DBHandler) FindByID(id uint) (*models.Location, error) {
 func (self DBHandler) FindManyBy(query *Query) ([]*models.Location, error) {
 	var locations []*models.Location
 
-	resp := self.DBProvider.DB.
+	resp := self.
 		Select("id", "location_id", "name", "slug").
 		Where("location_id", query.LocationID).
 		Find(&locations)

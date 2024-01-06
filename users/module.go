@@ -17,6 +17,7 @@ var Module = core.ModuleBuilder().
 	).
 	Providers(
 		providers.DBHandler{},
-		authProviders.DBHandler{},
+		providers.DBValidation{},
+		authProviders.Cipher{},
 	).
 	Build()

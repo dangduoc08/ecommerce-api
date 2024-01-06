@@ -2,6 +2,7 @@ package dtos
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/dangduoc08/ecommerce-api/utils"
 	"github.com/dangduoc08/ecommerce-api/validators"
@@ -12,7 +13,7 @@ import (
 )
 
 type CREATE_Body_Data struct {
-	Username  string `bind:"username" validate:"required,gte=6"`
+	Username  string `bind:"username" validate:"required,gte=6,username"`
 	Password  string `bind:"password" validate:"required,password"`
 	Email     string `bind:"email" validate:"required,email"`
 	FirstName string `bind:"first_name" validate:"required"`
@@ -31,10 +32,26 @@ func (self CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata
 	bindedStruct, fls := body.Bind(self)
 	bodyDTO := bindedStruct.(CREATE_Body)
 
+	bodyDTO.Data.Username = strings.TrimSpace(bodyDTO.Data.Username)
+	bodyDTO.Data.FirstName = strings.TrimSpace(bodyDTO.Data.FirstName)
+	bodyDTO.Data.FirstName = strings.TrimSpace(bodyDTO.Data.FirstName)
+	bodyDTO.Data.Email = strings.TrimSpace(bodyDTO.Data.Email)
+	bodyDTO.Data.GroupIDs = utils.ArrToUnique(bodyDTO.Data.GroupIDs)
+
 	fieldMap := make(map[string]gooh.FieldLevel)
 	for _, fl := range fls {
 		fieldMap[fl.Field()] = fl
 	}
+
+	validate.RegisterValidation("username", validators.ValidateUsername(func(fieldErr validator.FieldError) {
+		if fieldErr != nil {
+			fl := fieldMap[fieldErr.Field()]
+			errMsgs = append(errMsgs, map[string]any{
+				"field": fl.Tag(),
+				"error": fmt.Sprint("must include valid characters"),
+			})
+		}
+	}))
 
 	validate.RegisterValidation("password", validators.ValidatePassword(func(fieldErr validator.FieldError) {
 		if fieldErr != nil {
@@ -60,8 +77,6 @@ func (self CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata
 	if len(errMsgs) > 0 {
 		panic(exception.UnprocessableEntityException(errMsgs))
 	}
-
-	bodyDTO.Data.GroupIDs = utils.ArrToUnique(bodyDTO.Data.GroupIDs)
 
 	return bodyDTO
 }

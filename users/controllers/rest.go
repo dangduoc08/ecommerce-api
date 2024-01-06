@@ -17,6 +17,7 @@ type REST struct {
 	common.Guard
 	common.Logger
 	providers.DBHandler
+	providers.DBValidation
 	config.ConfigService
 }
 
@@ -25,20 +26,19 @@ func (self REST) NewController() core.Controller {
 		Prefix("v1").
 		Prefix("users")
 
-	self.BindGuard(
-		shared.AuthGuard{},
-	)
+	self.
+		BindGuard(shared.AuthGuard{})
 
 	return self
 }
 
 func (self REST) READ(
-	accessTokenPayloadDTO shared.AccessTokenPayloadDTO,
+	tokenClaimsDTO shared.TokenClaimsDTO,
 	queryDTO dtos.READ_Query,
-	c gooh.Context,
+	ctx gooh.Context,
 ) []*models.User {
-	users, err := self.FindManyBy(&providers.UserQuery{
-		StoreID:  accessTokenPayloadDTO.StoreID,
+	users, err := self.FindManyBy(&providers.Query{
+		StoreID:  tokenClaimsDTO.StoreID,
 		Statuses: queryDTO.Statuses,
 		Sort:     queryDTO.Sort,
 		Order:    queryDTO.Order,
@@ -48,9 +48,9 @@ func (self REST) READ(
 
 	if err != nil {
 		self.Debug(
-			"READ.UserDB.FindManyBy",
+			"READ.FindManyBy",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		return []*models.User{}
 	}
@@ -60,8 +60,8 @@ func (self REST) READ(
 
 func (self REST) CREATE(
 	bodyDTO dtos.CREATE_Body,
-	accessTokenPayloadDTO shared.AccessTokenPayloadDTO,
-	c gooh.Context,
+	tokenClaimsDTO shared.TokenClaimsDTO,
+	ctx gooh.Context,
 ) *models.User {
 	dataCheckDuplication := []map[string]string{
 		{
@@ -72,12 +72,12 @@ func (self REST) CREATE(
 		},
 	}
 
-	if self.IsDuplicated(dataCheckDuplication) {
+	if self.CheckDuplicated(dataCheckDuplication) {
 		panic(exception.ConflictException("user's information has taken"))
 	}
 
-	dataCreation := &providers.UserCreation{
-		StoreID:   accessTokenPayloadDTO.StoreID,
+	dataCreation := &providers.Creation{
+		StoreID:   tokenClaimsDTO.StoreID,
 		Username:  bodyDTO.Data.Username,
 		Password:  bodyDTO.Data.Password,
 		Email:     bodyDTO.Data.Email,
@@ -88,9 +88,9 @@ func (self REST) CREATE(
 	user, err := self.CreateOne(dataCreation)
 	if err != nil {
 		self.Error(
-			"CREATE.UserDB.CreateOne",
+			"CREATE.CreateOne",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		panic(exception.InternalServerErrorException(err.Error()))
 	}
@@ -99,16 +99,17 @@ func (self REST) CREATE(
 }
 
 func (self REST) MODIFY_statuses_OF_BY_id(
-	accessTokenPayloadDTO shared.AccessTokenPayloadDTO,
+	tokenClaimsDTO shared.TokenClaimsDTO,
+	paramDTO dtos.MODIFY_statuses_OF_BY_id_Param,
 	bodyDTO dtos.MODIFY_statuses_OF_BY_id,
-	c gooh.Context,
+	ctx gooh.Context,
 ) *models.User {
-	user, err := self.FindByID(accessTokenPayloadDTO.ID)
+	user, err := self.FindByID(paramDTO.ID)
 	if err != nil {
 		self.Error(
 			"MODIFY_statuses_OF_BY_id.FindByID",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		panic(exception.NotFoundException(err.Error()))
 	}
@@ -119,7 +120,7 @@ func (self REST) MODIFY_statuses_OF_BY_id(
 		self.Error(
 			"MODIFY_statuses_OF_BY_id.ModifyOne",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		panic(exception.InternalServerErrorException(err.Error()))
 	}

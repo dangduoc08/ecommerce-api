@@ -15,6 +15,6 @@ var Module = core.ModuleBuilder().
 		controllers.REST{},
 	).
 	Providers(
-		providers.DBHandler{},
+		providers.Cipher{},
 	).
 	Build()

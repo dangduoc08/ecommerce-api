@@ -15,10 +15,7 @@ var Module = func() *core.Module {
 
 	mod := core.ModuleBuilder().
 		Controllers(
-			controllers.DirREST{
-				PublicPath: publicPath,
-			},
-			controllers.FileREST{
+			controllers.REST{
 				PublicPath: publicPath,
 			},
 		).

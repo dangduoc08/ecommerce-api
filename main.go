@@ -5,10 +5,11 @@ import (
 	"github.com/dangduoc08/ecommerce-api/assets"
 	"github.com/dangduoc08/ecommerce-api/auths"
 	"github.com/dangduoc08/ecommerce-api/categories"
-	"github.com/dangduoc08/ecommerce-api/conf"
+	"github.com/dangduoc08/ecommerce-api/confs"
 	"github.com/dangduoc08/ecommerce-api/db"
 	"github.com/dangduoc08/ecommerce-api/groups"
 	"github.com/dangduoc08/ecommerce-api/locations"
+	"github.com/dangduoc08/ecommerce-api/manufacturers"
 	"github.com/dangduoc08/ecommerce-api/permissions"
 	"github.com/dangduoc08/ecommerce-api/seeds"
 	"github.com/dangduoc08/ecommerce-api/shared"
@@ -36,7 +37,7 @@ func main() {
 		core.ModuleBuilder().
 			Imports(
 				db.Module,
-				conf.Module,
+				confs.Module,
 				auths.Module,
 				users.Module,
 				stores.Module,
@@ -47,6 +48,7 @@ func main() {
 				groups.Module,
 				permissions.Module,
 				categories.Module,
+				manufacturers.Module,
 			).
 			Build(),
 	)

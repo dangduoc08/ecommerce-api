@@ -6,6 +6,7 @@ import (
 	"github.com/dangduoc08/ecommerce-api/categories/models"
 	"github.com/dangduoc08/ecommerce-api/constants"
 	dbProviders "github.com/dangduoc08/ecommerce-api/db/providers"
+	"github.com/dangduoc08/ecommerce-api/utils"
 	"github.com/dangduoc08/gooh/core"
 	"gorm.io/gorm/clause"
 )
@@ -126,20 +127,47 @@ func (self DBHandler) UpdateByID(id uint, data *Update) (*models.Category, error
 		Slug:            data.Slug,
 		Status:          data.Status,
 	}
+
 	if parentCategories, err := self.CheckParentCategories(data.ParentCategoryIDs); err != nil {
 		return nil, err
 	} else {
 		categoryRec.ParentCategories = parentCategories
 	}
 
-	if err := self.
-		Clauses(clause.Returning{}).
-		Updates(&categoryRec).
-		Error; err != nil {
+	if err := self.CheckCategoryRelationship(id, data.ParentCategoryIDs); err != nil {
 		return nil, err
 	}
 
-	return categoryRec, nil
+	tx := self.DB.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	currentParentCategoryIDs := self.FindCurrentParentCategoryIDs(id)
+	for _, currentParentCategoryID := range currentParentCategoryIDs {
+		if !utils.ArrIncludes(data.ParentCategoryIDs, currentParentCategoryID) {
+			if err := tx.Exec("DELETE FROM categories_categories WHERE parent_category_id = ?", currentParentCategoryID).Error; err != nil {
+				tx.Rollback()
+				return nil, err
+			}
+		}
+	}
+
+	if err := tx.
+		Clauses(clause.Returning{}).
+		Updates(&categoryRec).
+		Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	return categoryRec, tx.Commit().Error
 }
 
 func (self DBHandler) FindManyAsMenu(query *Query) (*[]map[string]any, error) {
@@ -153,7 +181,7 @@ func (self DBHandler) FindManyAsMenu(query *Query) (*[]map[string]any, error) {
 	base := `
 		SELECT
 			categories.*,
-			json_agg(to_json(child)) AS child_categories
+			json_agg(to_json(child)) AS sub_categories
 		FROM
 			categories
 			LEFT JOIN categories_categories
@@ -197,4 +225,13 @@ func (self DBHandler) FindManyAsMenu(query *Query) (*[]map[string]any, error) {
 	}
 
 	return menu, nil
+}
+
+func (self DBHandler) FindCurrentParentCategoryIDs(categoryID uint) []uint {
+	categoryCategoryRecs := []*models.CategoryCategory{}
+	self.Raw("SELECT * FROM categories_categories WHERE category_id = ?", categoryID).Scan(&categoryCategoryRecs)
+
+	return utils.ArrMap(categoryCategoryRecs, func(categoryCategoryRec *models.CategoryCategory, i int) uint {
+		return categoryCategoryRec.ParentCategoryID
+	})
 }

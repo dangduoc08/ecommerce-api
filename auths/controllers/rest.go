@@ -21,8 +21,8 @@ import (
 type REST struct {
 	common.REST
 	common.Guard
-	providers.DBHandler
-	UserDBHandler userProviders.DBHandler
+	providers.Cipher
+	userProviders.DBHandler
 	config.ConfigService
 	common.Logger
 
@@ -37,10 +37,11 @@ func (self REST) NewController() core.Controller {
 		Prefix("v1").
 		Prefix("auths")
 
-	self.BindGuard(
-		guards.TokenRefresh{},
-		self.CREATE_tokens,
-	)
+	self.
+		BindGuard(
+			guards.TokenRefresh{},
+			self.CREATE_tokens,
+		)
 
 	self.JWTAccessAPIKey = self.Get("JWT_ACCESS_API_KEY").(string)
 	self.JWTAccessAPIExpIn = self.Get("JWT_ACCESS_API_EXP_IN").(int)
@@ -51,18 +52,18 @@ func (self REST) NewController() core.Controller {
 }
 
 func (self REST) CREATE_sessions(
-	c gooh.Context,
+	ctx gooh.Context,
 	bodyDTO dtos.CREATE_sessions_Body,
 ) gooh.Map {
-	user, err := self.UserDBHandler.FindOneBy(&userProviders.UserQuery{
+	user, err := self.FindOneBy(&userProviders.Query{
 		Username: bodyDTO.Data.Username,
 	})
 
 	if err != nil {
 		self.Error(
-			"REST.CREATE_sessions.UserDB.FindOneBy",
+			"CREATE_sessions.FindOneBy",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		panic(exception.NotFoundException(err.Error()))
 	}
@@ -94,7 +95,7 @@ func (self REST) CREATE_sessions(
 		self.Error(
 			"UserProvider.SignToken",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		panic(exception.InternalServerErrorException(err.Error()))
 	}
@@ -111,7 +112,7 @@ func (self REST) CREATE_sessions(
 		self.Error(
 			"UserProvider.SignToken",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		panic(exception.InternalServerErrorException(err.Error()))
 	}
@@ -131,22 +132,21 @@ func (self REST) CREATE_sessions(
 }
 
 func (self REST) CREATE_tokens(
-	c gooh.Context,
+	ctx gooh.Context,
 ) gooh.Map {
-	tokenClaims := c.Request.Context().Value("tokenClaims").(jwt.MapClaims)
+	tokenClaims := ctx.Request.Context().Value("tokenClaims").(jwt.MapClaims)
 	userID := uint(tokenClaims["id"].(float64))
 
-	user, err := self.UserDBHandler.FindByID(userID)
+	user, err := self.FindByID(userID)
 	if err != nil {
 		self.Error(
-			"REST.CREATE_tokens.UserDB.FindByID",
+			"CREATE_tokens.FindByID",
 			"message", err.Error(),
-			"X-Request-ID", c.GetID(),
+			"X-Request-ID", ctx.GetID(),
 		)
 		panic(exception.NotFoundException(err.Error()))
 	}
 
-	// check user should be active
 	if user.Status != userModels.UserStatus(constants.USER_ACTIVE) {
 		panic(exception.UnauthorizedException(fmt.Sprintf("user'status is %v", user.Status)))
 	}
@@ -166,7 +166,7 @@ func (self REST) CREATE_tokens(
 		self.JWTAccessAPIExpIn,
 	)
 
-	refreshTokenCookie, _ := c.Cookie("refresh_token")
+	refreshTokenCookie, _ := ctx.Cookie("refresh_token")
 	refreshToken := strings.Replace(refreshTokenCookie.Value, "Bearer ", "", 1)
 
 	return gooh.Map{
