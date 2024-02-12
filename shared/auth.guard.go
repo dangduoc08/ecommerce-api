@@ -17,13 +17,13 @@ type AuthGuard struct {
 	JWTAccessAPIKey string
 }
 
-func (self AuthGuard) NewGuard() AuthGuard {
-	self.JWTAccessAPIKey = self.ConfigService.Get("JWT_ACCESS_API_KEY").(string)
+func (instance AuthGuard) NewGuard() AuthGuard {
+	instance.JWTAccessAPIKey = instance.ConfigService.Get("JWT_ACCESS_API_KEY").(string)
 
-	return self
+	return instance
 }
 
-func (self AuthGuard) checkPermission(accessTo string, permissions []any) bool {
+func (instance AuthGuard) checkPermission(accessTo string, permissions []any) bool {
 	if utils.ArrIncludes(permissions, "*") {
 		return true
 	}
@@ -37,7 +37,7 @@ func (self AuthGuard) checkPermission(accessTo string, permissions []any) bool {
 	return false
 }
 
-func (self AuthGuard) CanActivate(c gooh.Context) bool {
+func (instance AuthGuard) CanActivate(c gooh.Context) bool {
 	accessTokenCookie, err := c.Cookie("access_token")
 	if err != nil {
 		return false
@@ -51,7 +51,7 @@ func (self AuthGuard) CanActivate(c gooh.Context) bool {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(self.JWTAccessAPIKey), nil
+		return []byte(instance.JWTAccessAPIKey), nil
 	})
 
 	if err != nil {
@@ -63,7 +63,7 @@ func (self AuthGuard) CanActivate(c gooh.Context) bool {
 		ctxWithValue := context.WithValue(c.Context(), "tokenClaims", token.Claims.(jwt.MapClaims))
 		c.Request = c.WithContext(ctxWithValue)
 
-		return self.checkPermission(matchedRoute, token.Claims.(jwt.MapClaims)["permissions"].([]any))
+		return instance.checkPermission(matchedRoute, token.Claims.(jwt.MapClaims)["permissions"].([]any))
 	}
 
 	return false

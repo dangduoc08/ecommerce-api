@@ -11,7 +11,7 @@ import (
 
 var Module = func() *core.Module {
 	currentDir, _ := os.Getwd()
-	publicPath := filepath.Join(currentDir, "public")
+	publicPath := filepath.Join(currentDir, "publics")
 
 	mod := core.ModuleBuilder().
 		Controllers(

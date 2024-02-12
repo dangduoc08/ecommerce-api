@@ -2,6 +2,7 @@ package dtos
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/dangduoc08/ecommerce-api/utils"
 	"github.com/dangduoc08/ecommerce-api/validators"
@@ -21,12 +22,14 @@ type CREATE_Body struct {
 	Data CREATE_Body_Data `bind:"data"`
 }
 
-func (self CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
+func (instance CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	bindedBody, fls := body.Bind(self)
+	bindedBody, fls := body.Bind(instance)
 	bodyDTO := bindedBody.(CREATE_Body)
+
+	bodyDTO.Data.Name = strings.TrimSpace(bodyDTO.Data.Name)
 
 	fieldMap := make(map[string]gooh.FieldLevel)
 	for _, fl := range fls {
@@ -34,7 +37,7 @@ func (self CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata
 	}
 
 	availablePermissions := []string{}
-	for _, restConfiguration := range self.GetConfigurations() {
+	for _, restConfiguration := range instance.GetConfigurations() {
 		availablePermissions = append(
 			availablePermissions,
 			restConfiguration.Method+restConfiguration.Route,

@@ -19,23 +19,23 @@ type REST struct {
 	common.Logger
 }
 
-func (self REST) NewController() core.Controller {
-	self.
+func (instance REST) NewController() core.Controller {
+	instance.
 		Prefix("v1").
 		Prefix("categories")
 
-	self.
+	instance.
 		BindGuard(shared.AuthGuard{})
 
-	return self
+	return instance
 }
 
-func (self REST) READ(
+func (instance REST) READ(
 	ctx gooh.Context,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 	queryDTO dtos.READ_Query,
 ) any {
-	categories, err := self.FindManyBy(&providers.Query{
+	categories, err := instance.FindManyBy(&providers.Query{
 		StoreID: tokenClaimsDTO.StoreID,
 		Status:  models.CategoryStatus(queryDTO.Status),
 		Sort:    queryDTO.Sort,
@@ -45,7 +45,7 @@ func (self REST) READ(
 	})
 
 	if err != nil {
-		self.Logger.Debug(
+		instance.Logger.Debug(
 			"READ.FindManyBy",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -57,15 +57,15 @@ func (self REST) READ(
 	return categories
 }
 
-func (self REST) READ_BY_id(
+func (instance REST) READ_BY_id(
 	ctx gooh.Context,
 	paramDTO dtos.READ_BY_id_Param,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 ) *models.Category {
-	category, err := self.FindByID(paramDTO.ID)
+	category, err := instance.FindByID(paramDTO.ID)
 
 	if err != nil {
-		self.Logger.Debug(
+		instance.Logger.Debug(
 			"READ_BY_id.FindByID",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -76,12 +76,12 @@ func (self REST) READ_BY_id(
 	return category
 }
 
-func (self REST) CREATE(
+func (instance REST) CREATE(
 	ctx gooh.Context,
 	bodyDTO dtos.CREATE_Body,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 ) *models.Category {
-	category, err := self.CreateOne(&providers.Creation{
+	category, err := instance.CreateOne(&providers.Creation{
 		Name:              bodyDTO.Data.Name,
 		Description:       &bodyDTO.Data.Description,
 		StoreID:           tokenClaimsDTO.StoreID,
@@ -93,7 +93,7 @@ func (self REST) CREATE(
 	})
 
 	if err != nil {
-		self.Debug(
+		instance.Debug(
 			"CREATE.CreateOne",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -104,13 +104,13 @@ func (self REST) CREATE(
 	return category
 }
 
-func (self REST) UPDATE_BY_id(
+func (instance REST) UPDATE_BY_id(
 	ctx gooh.Context,
 	paramDTO dtos.UPDATE_BY_id_Param,
 	bodyDTO dtos.UPDATE_BY_id_Body,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 ) *models.Category {
-	_, err := self.FindOneBy(&providers.Query{
+	_, err := instance.FindOneBy(&providers.Query{
 		ID:      paramDTO.ID,
 		StoreID: tokenClaimsDTO.StoreID,
 	})
@@ -119,7 +119,7 @@ func (self REST) UPDATE_BY_id(
 		panic(exception.NotFoundException(err.Error()))
 	}
 
-	category, err := self.UpdateByID(paramDTO.ID, &providers.Update{
+	category, err := instance.UpdateByID(paramDTO.ID, &providers.Update{
 		StoreID:           tokenClaimsDTO.StoreID,
 		Name:              bodyDTO.Data.Name,
 		Description:       &bodyDTO.Data.Description,
@@ -131,7 +131,7 @@ func (self REST) UPDATE_BY_id(
 	})
 
 	if err != nil {
-		self.Logger.Debug(
+		instance.Logger.Debug(
 			"UPDATE_BY_id.UpdateByID",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),

@@ -15,11 +15,11 @@ type READ_addresses_OF_BY_id_Param struct {
 	ID uint `bind:"id" validate:"required"`
 }
 
-func (self READ_addresses_OF_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
+func (instance READ_addresses_OF_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	paramDTO, fls := param.Bind(self)
+	paramDTO, fls := param.Bind(instance)
 
 	fieldMap := make(map[string]gooh.FieldLevel)
 	for _, fl := range fls {
@@ -52,11 +52,11 @@ type READ_addresses_OF_BY_id_Query struct {
 	Offset int    `bind:"offset" validate:"gte=0"`
 }
 
-func (self READ_addresses_OF_BY_id_Query) Transform(query gooh.Query, medata common.ArgumentMetadata) any {
+func (instance READ_addresses_OF_BY_id_Query) Transform(query gooh.Query, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	bindedStruct, fls := query.Bind(self)
+	bindedStruct, fls := query.Bind(instance)
 	queryDTO := bindedStruct.(READ_addresses_OF_BY_id_Query)
 
 	fieldMap := make(map[string]gooh.FieldLevel)

@@ -16,13 +16,13 @@ type TokenRefresh struct {
 	JWTRefreshTokenAPIKey string
 }
 
-func (self TokenRefresh) NewGuard() TokenRefresh {
-	self.JWTRefreshTokenAPIKey = self.Get("JWT_REFRESH_TOKEN_KEY").(string)
+func (instance TokenRefresh) NewGuard() TokenRefresh {
+	instance.JWTRefreshTokenAPIKey = instance.Get("JWT_REFRESH_TOKEN_KEY").(string)
 
-	return self
+	return instance
 }
 
-func (self TokenRefresh) CanActivate(c gooh.Context) bool {
+func (instance TokenRefresh) CanActivate(c gooh.Context) bool {
 	refreshTokenCookie, err := c.Cookie("refresh_token")
 	if err != nil {
 		return false
@@ -36,7 +36,7 @@ func (self TokenRefresh) CanActivate(c gooh.Context) bool {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(self.JWTRefreshTokenAPIKey), nil
+		return []byte(instance.JWTRefreshTokenAPIKey), nil
 	})
 
 	if err != nil {

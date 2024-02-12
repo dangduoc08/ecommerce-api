@@ -16,20 +16,20 @@ type HandleAsset struct {
 	PublicPath string
 }
 
-func (self HandleAsset) NewProvider() core.Provider {
-	self.MaxDepth = 1
+func (instance HandleAsset) NewProvider() core.Provider {
+	instance.MaxDepth = 1
 
-	return self
+	return instance
 }
 
-func (self HandleAsset) List(dirPath string) ([]*models.Asset, error) {
+func (instance HandleAsset) List(dirPath string) ([]*models.Asset, error) {
 	assets := []*models.Asset{}
 	filepath.WalkDir(dirPath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 
-		if strings.Count(path, string(os.PathSeparator))-strings.Count(dirPath, string(os.PathSeparator)) > self.MaxDepth {
+		if strings.Count(path, string(os.PathSeparator))-strings.Count(dirPath, string(os.PathSeparator)) > instance.MaxDepth {
 			return fs.SkipDir
 		}
 
@@ -56,14 +56,14 @@ func (self HandleAsset) List(dirPath string) ([]*models.Asset, error) {
 	return assets, nil
 }
 
-func (self HandleAsset) Mkdir(dirPath, dirName string) (string, error) {
-	path := self.GeneratePath(dirPath+dirName, 1)
+func (instance HandleAsset) Mkdir(dirPath, dirName string) (string, error) {
+	path := instance.GeneratePath(dirPath+dirName, 1)
 
 	if err := os.Mkdir(path, os.ModePerm); err != nil {
 		return "", err
 	}
 
-	path = strings.Replace(path, self.PublicPath, "", 1)
+	path = strings.Replace(path, instance.PublicPath, "", 1)
 	if path != "" {
 		path = path[1:]
 	}
@@ -71,7 +71,7 @@ func (self HandleAsset) Mkdir(dirPath, dirName string) (string, error) {
 	return path, nil
 }
 
-func (self HandleAsset) CleanDir(dir string) string {
+func (instance HandleAsset) CleanDir(dir string) string {
 	if dir != "" {
 		if dir[0] != filepath.Separator {
 			dir = "/" + dir
@@ -82,7 +82,7 @@ func (self HandleAsset) CleanDir(dir string) string {
 	return dir
 }
 
-func (self HandleAsset) GeneratePath(path string, i int) string {
+func (instance HandleAsset) GeneratePath(path string, i int) string {
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		ext := filepath.Ext(path)
 		pathWithoutExt := strings.TrimSuffix(path, ext)
@@ -92,7 +92,7 @@ func (self HandleAsset) GeneratePath(path string, i int) string {
 
 		i++
 		newPath := fmt.Sprintf("%v (%v)%v", pathWithoutExt, i, ext)
-		return self.GeneratePath(newPath, i)
+		return instance.GeneratePath(newPath, i)
 	}
 
 	return path

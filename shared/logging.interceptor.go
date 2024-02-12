@@ -15,7 +15,7 @@ type LoggingInterceptor struct {
 	Logger        common.Logger
 }
 
-func (self LoggingInterceptor) Intercept(c gooh.Context, aggregation gooh.Aggregation) any {
+func (instance LoggingInterceptor) Intercept(c gooh.Context, aggregation gooh.Aggregation) any {
 	datas := []any{}
 
 	if c.Method == http.MethodPost || c.Method == http.MethodPut || c.Method == http.MethodPatch {
@@ -55,7 +55,7 @@ func (self LoggingInterceptor) Intercept(c gooh.Context, aggregation gooh.Aggreg
 	}
 
 	datas = append(datas, "X-Request-ID", c.GetID())
-	self.Logger.Info(
+	instance.Logger.Info(
 		"RequestData",
 		datas...,
 	)
@@ -65,13 +65,13 @@ func (self LoggingInterceptor) Intercept(c gooh.Context, aggregation gooh.Aggreg
 			resJSON, _ := json.Marshal(data)
 			resJSONStr := string(resJSON)
 			if resJSONStr != "{}" {
-				self.Logger.Info(
+				instance.Logger.Info(
 					"SuccessResponse",
 					"data", resJSONStr,
 					"X-Request-ID", c.GetID(),
 				)
 			} else {
-				self.Logger.Info(
+				instance.Logger.Info(
 					"SuccessResponse",
 					"data", nil,
 					"X-Request-ID", c.GetID(),
@@ -81,14 +81,14 @@ func (self LoggingInterceptor) Intercept(c gooh.Context, aggregation gooh.Aggreg
 		}),
 		aggregation.Error(func(c gooh.Context, err any) any {
 			if httpException, ok := err.(exception.HTTPException); ok {
-				self.Logger.Debug(
+				instance.Logger.Debug(
 					"ErrorResponse",
 					"data", err,
 					"message", httpException.GetResponse(),
 					"X-Request-ID", c.GetID(),
 				)
 			} else {
-				self.Logger.Debug(
+				instance.Logger.Debug(
 					"ErrorResponse",
 					"data", err,
 					"X-Request-ID", c.GetID(),

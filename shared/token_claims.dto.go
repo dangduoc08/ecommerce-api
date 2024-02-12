@@ -17,7 +17,7 @@ type TokenClaimsDTO struct {
 	Permissions []string `bind:"permissions"`
 }
 
-func (self TokenClaimsDTO) Transform(c gooh.Context, medata common.ArgumentMetadata) any {
+func (instance TokenClaimsDTO) Transform(c gooh.Context, medata common.ArgumentMetadata) any {
 	tokenClaims := c.Context().Value("tokenClaims").(jwt.MapClaims)
 	tokenClaimsDTO, _ := ctx.BindStruct(tokenClaims, &[]ctx.FieldLevel{}, TokenClaimsDTO{}, "")
 

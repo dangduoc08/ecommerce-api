@@ -2,6 +2,7 @@ package dtos
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/dangduoc08/ecommerce-api/validators"
 	"github.com/dangduoc08/gooh"
@@ -14,11 +15,11 @@ type UPDATE_BY_id_Param struct {
 	ID uint `bind:"id" validate:"required"`
 }
 
-func (self UPDATE_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
+func (instance UPDATE_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	paramDTO, fls := param.Bind(self)
+	paramDTO, fls := param.Bind(instance)
 
 	fieldMap := make(map[string]gooh.FieldLevel)
 	for _, fl := range fls {
@@ -55,12 +56,17 @@ type UPDATE_BY_id_Body struct {
 	Data UPDATE_BY_id_Body_Data `bind:"data"`
 }
 
-func (self UPDATE_BY_id_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
+func (instance UPDATE_BY_id_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	dto, fls := body.Bind(self)
+	dto, fls := body.Bind(instance)
 	bodyDTO := dto.(UPDATE_BY_id_Body)
+
+	bodyDTO.Data.Name = strings.TrimSpace(bodyDTO.Data.Name)
+	bodyDTO.Data.Description = strings.TrimSpace(bodyDTO.Data.Description)
+	bodyDTO.Data.Phone = strings.TrimSpace(bodyDTO.Data.Phone)
+	bodyDTO.Data.Email = strings.TrimSpace(bodyDTO.Data.Email)
 
 	fieldMap := make(map[string]gooh.FieldLevel)
 	for _, fl := range fls {

@@ -21,11 +21,11 @@ type MODIFY_Body struct {
 	Data MODIFY_Body_Data `bind:"data"`
 }
 
-func (self MODIFY_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
+func (instance MODIFY_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	dto, fls := body.Bind(self)
+	dto, fls := body.Bind(instance)
 	bodyDTO := dto.(MODIFY_Body)
 	bodyDTO.Data.NewDir = strings.TrimSpace(bodyDTO.Data.NewDir)
 
@@ -50,8 +50,8 @@ func (self MODIFY_Body) Transform(body gooh.Body, medata common.ArgumentMetadata
 		panic(exception.UnprocessableEntityException(errMsgs))
 	}
 
-	bodyDTO.Data.OldDir = self.CleanDir(bodyDTO.Data.OldDir)
-	bodyDTO.Data.NewDir = self.CleanDir(bodyDTO.Data.NewDir)
+	bodyDTO.Data.OldDir = instance.CleanDir(bodyDTO.Data.OldDir)
+	bodyDTO.Data.NewDir = instance.CleanDir(bodyDTO.Data.NewDir)
 
 	return bodyDTO
 }

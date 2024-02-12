@@ -16,8 +16,8 @@ type CREATE_Body struct {
 	Data CREATE_Body_Data `bind:"data"`
 }
 
-func (self CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
-	bindedBody, _ := body.Bind(self)
+func (instance CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
+	bindedBody, _ := body.Bind(instance)
 	bodyDTO := bindedBody.(CREATE_Body)
 
 	bodyDTO.Data.StreetName = strings.TrimSpace(bodyDTO.Data.StreetName)

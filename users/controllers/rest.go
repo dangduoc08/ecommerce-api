@@ -21,23 +21,23 @@ type REST struct {
 	config.ConfigService
 }
 
-func (self REST) NewController() core.Controller {
-	self.
+func (instance REST) NewController() core.Controller {
+	instance.
 		Prefix("v1").
 		Prefix("users")
 
-	self.
+	instance.
 		BindGuard(shared.AuthGuard{})
 
-	return self
+	return instance
 }
 
-func (self REST) READ(
+func (instance REST) READ(
 	tokenClaimsDTO shared.TokenClaimsDTO,
 	queryDTO dtos.READ_Query,
 	ctx gooh.Context,
 ) []*models.User {
-	users, err := self.FindManyBy(&providers.Query{
+	users, err := instance.FindManyBy(&providers.Query{
 		StoreID:  tokenClaimsDTO.StoreID,
 		Statuses: queryDTO.Statuses,
 		Sort:     queryDTO.Sort,
@@ -47,7 +47,7 @@ func (self REST) READ(
 	})
 
 	if err != nil {
-		self.Debug(
+		instance.Debug(
 			"READ.FindManyBy",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -58,7 +58,7 @@ func (self REST) READ(
 	return users
 }
 
-func (self REST) CREATE(
+func (instance REST) CREATE(
 	bodyDTO dtos.CREATE_Body,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 	ctx gooh.Context,
@@ -72,7 +72,7 @@ func (self REST) CREATE(
 		},
 	}
 
-	if self.CheckDuplicated(dataCheckDuplication) {
+	if instance.CheckDuplicated(dataCheckDuplication) {
 		panic(exception.ConflictException("user's information has taken"))
 	}
 
@@ -85,9 +85,9 @@ func (self REST) CREATE(
 		LastName:  bodyDTO.Data.LastName,
 		GroupIDs:  bodyDTO.Data.GroupIDs,
 	}
-	user, err := self.CreateOne(dataCreation)
+	user, err := instance.CreateOne(dataCreation)
 	if err != nil {
-		self.Error(
+		instance.Error(
 			"CREATE.CreateOne",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -98,15 +98,15 @@ func (self REST) CREATE(
 	return user
 }
 
-func (self REST) MODIFY_statuses_OF_BY_id(
+func (instance REST) MODIFY_statuses_OF_BY_id(
 	tokenClaimsDTO shared.TokenClaimsDTO,
 	paramDTO dtos.MODIFY_statuses_OF_BY_id_Param,
 	bodyDTO dtos.MODIFY_statuses_OF_BY_id,
 	ctx gooh.Context,
 ) *models.User {
-	user, err := self.FindByID(paramDTO.ID)
+	user, err := instance.FindByID(paramDTO.ID)
 	if err != nil {
-		self.Error(
+		instance.Error(
 			"MODIFY_statuses_OF_BY_id.FindByID",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -115,9 +115,9 @@ func (self REST) MODIFY_statuses_OF_BY_id(
 	}
 	user.Status = models.UserStatus(bodyDTO.Data.Status)
 
-	user, err = self.ModifyOne(user)
+	user, err = instance.ModifyOne(user)
 	if err != nil {
-		self.Error(
+		instance.Error(
 			"MODIFY_statuses_OF_BY_id.ModifyOne",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),

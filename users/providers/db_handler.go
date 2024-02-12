@@ -5,7 +5,7 @@ import (
 
 	authProviders "github.com/dangduoc08/ecommerce-api/auths/providers"
 	"github.com/dangduoc08/ecommerce-api/constants"
-	dbProviders "github.com/dangduoc08/ecommerce-api/db/providers"
+	dbProviders "github.com/dangduoc08/ecommerce-api/dbs/providers"
 	groupModels "github.com/dangduoc08/ecommerce-api/groups/models"
 	groupProviders "github.com/dangduoc08/ecommerce-api/groups/providers"
 	"github.com/dangduoc08/ecommerce-api/users/models"
@@ -19,16 +19,16 @@ type DBHandler struct {
 	GroupDBHandler groupProviders.DBHandler
 }
 
-func (self DBHandler) NewProvider() core.Provider {
-	return self
+func (instance DBHandler) NewProvider() core.Provider {
+	return instance
 }
 
-func (self DBHandler) FindByID(id uint) (*models.User, error) {
+func (instance DBHandler) FindByID(id uint) (*models.User, error) {
 	userRec := &models.User{
 		ID: id,
 	}
 
-	if err := self.DB.
+	if err := instance.DB.
 		Preload("Groups").
 		First(userRec).Error; err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (self DBHandler) FindByID(id uint) (*models.User, error) {
 	return userRec, nil
 }
 
-func (self DBHandler) FindOneBy(query *Query) (*models.User, error) {
+func (instance DBHandler) FindOneBy(query *Query) (*models.User, error) {
 	userRec := &models.User{}
 	userQueries := map[string]any{}
 
@@ -49,7 +49,7 @@ func (self DBHandler) FindOneBy(query *Query) (*models.User, error) {
 		userQueries["email"] = query.Username
 	}
 
-	if err := self.DB.
+	if err := instance.DB.
 		Where(userQueries).
 		Preload("Groups").
 		First(userRec).
@@ -60,11 +60,11 @@ func (self DBHandler) FindOneBy(query *Query) (*models.User, error) {
 	return userRec, nil
 }
 
-func (self DBHandler) FindManyBy(query *Query) ([]*models.User, error) {
+func (instance DBHandler) FindManyBy(query *Query) ([]*models.User, error) {
 	userRecs := []*models.User{}
 	userQueries := map[string]any{}
 
-	tx := self.DB.DB
+	tx := instance.DB.DB
 	if query != nil {
 		if len(query.Statuses) > 0 {
 			tx = tx.Where("status IN ?", query.Statuses)
@@ -105,9 +105,9 @@ func (self DBHandler) FindManyBy(query *Query) ([]*models.User, error) {
 	return userRecs, nil
 }
 
-func (self DBHandler) CreateOne(data *Creation) (*models.User, error) {
+func (instance DBHandler) CreateOne(data *Creation) (*models.User, error) {
 
-	hash, err := self.HashPassword(data.Password)
+	hash, err := instance.HashPassword(data.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (self DBHandler) CreateOne(data *Creation) (*models.User, error) {
 		Groups:    groups,
 	}
 	if len(data.GroupIDs) > 0 {
-		groups, err := self.GroupDBHandler.FindManyBy(&groupProviders.Query{
+		groups, err := instance.GroupDBHandler.FindManyBy(&groupProviders.Query{
 			IDs:     data.GroupIDs,
 			StoreID: data.StoreID,
 			Limit:   len(data.GroupIDs),
@@ -148,13 +148,13 @@ func (self DBHandler) CreateOne(data *Creation) (*models.User, error) {
 		userRec.Groups = groups
 	}
 
-	if err := self.Create(userRec).Error; err != nil {
+	if err := instance.Create(userRec).Error; err != nil {
 		return nil, err
 	}
 
 	return userRec, nil
 }
 
-func (self DBHandler) ModifyOne(user *models.User) (*models.User, error) {
-	return user, self.Save(user).Error
+func (instance DBHandler) ModifyOne(user *models.User) (*models.User, error) {
+	return user, instance.Save(user).Error
 }

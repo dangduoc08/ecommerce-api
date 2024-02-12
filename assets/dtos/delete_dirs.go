@@ -12,13 +12,13 @@ type DELETE_Query struct {
 	Dirs []string `bind:"dirs"`
 }
 
-func (self DELETE_Query) Transform(query gooh.Query, medata common.ArgumentMetadata) any {
-	bindedStruct, _ := query.Bind(self)
+func (instance DELETE_Query) Transform(query gooh.Query, medata common.ArgumentMetadata) any {
+	bindedStruct, _ := query.Bind(instance)
 
 	queryDTO := bindedStruct.(DELETE_Query)
 
 	for i, dir := range queryDTO.Dirs {
-		queryDTO.Dirs[i] = self.CleanDir(dir)
+		queryDTO.Dirs[i] = instance.CleanDir(dir)
 	}
 	queryDTO.Dirs = utils.ArrToUnique(queryDTO.Dirs)
 

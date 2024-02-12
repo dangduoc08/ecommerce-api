@@ -17,15 +17,15 @@ type REST struct {
 	Blacklist      []string
 }
 
-func (self REST) NewController() core.Controller {
-	self.
+func (instance REST) NewController() core.Controller {
+	instance.
 		Prefix("v1").
 		Prefix("permissions")
 
-	self.
+	instance.
 		BindGuard(shared.AuthGuard{})
 
-	self.MethodToAction = map[string]string{
+	instance.MethodToAction = map[string]string{
 		http.MethodGet:    "read",
 		http.MethodPost:   "create",
 		http.MethodPut:    "update",
@@ -33,7 +33,7 @@ func (self REST) NewController() core.Controller {
 		http.MethodDelete: "delete",
 	}
 
-	self.Blacklist = []string{
+	instance.Blacklist = []string{
 		"POST/v1/auths/sessions",
 		"POST/v1/auths/tokens",
 		"GET/v1/stores/{id}",
@@ -41,21 +41,21 @@ func (self REST) NewController() core.Controller {
 		"GET/v1/stores/{id}/categories",
 	}
 
-	return self
+	return instance
 }
 
-func (self REST) READ() any {
+func (instance REST) READ() any {
 	permissions := map[string][]string{}
 
-	for _, restConfiguration := range self.GetConfigurations() {
+	for _, restConfiguration := range instance.GetConfigurations() {
 		pattern := restConfiguration.Method + restConfiguration.Route
-		if utils.ArrIncludes(self.Blacklist, pattern) {
+		if utils.ArrIncludes(instance.Blacklist, pattern) {
 			continue
 		}
-		perm := permissions[self.MethodToAction[restConfiguration.Method]]
+		perm := permissions[instance.MethodToAction[restConfiguration.Method]]
 		perm = append(perm, pattern)
 		sort.Sort(sort.StringSlice(perm))
-		permissions[self.MethodToAction[restConfiguration.Method]] = perm
+		permissions[instance.MethodToAction[restConfiguration.Method]] = perm
 	}
 
 	return permissions

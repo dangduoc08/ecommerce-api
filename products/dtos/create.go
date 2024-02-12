@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/dangduoc08/ecommerce-api/products/models"
+	"github.com/dangduoc08/ecommerce-api/utils"
 	"github.com/dangduoc08/ecommerce-api/validators"
 	"github.com/dangduoc08/gooh"
 	"github.com/dangduoc08/gooh/common"
@@ -12,9 +14,22 @@ import (
 )
 
 type CREATE_Body_Data struct {
-	Name string `bind:"name" validate:"required,gte=1"`
-	Slug string `bind:"slug" validate:"required,gte=1,slug"`
-	Logo string `bind:"logo" validate:"omitempty,http_url"`
+	Name            string                `bind:"name" validate:"required,gte=1"`
+	Description     string                `bind:"description"`
+	MetaTitle       string                `bind:"meta_title" validate:"required,gte=1"`
+	MetaDescription string                `bind:"meta_description" validate:"lte=160"`
+	Slug            string                `bind:"slug" validate:"required,gte=1,slug"`
+	Quantity        int                   `bind:"quantity" validate:"gte=0"`
+	SKU             string                `bind:"sku"`
+	Height          float64               `bind:"height" validate:"gte=0"`
+	Width           float64               `bind:"width" validate:"gte=0"`
+	Length          float64               `bind:"length" validate:"gte=0"`
+	Weight          float64               `bind:"weight" validate:"gte=0"`
+	CategoryIDs     []uint                `bind:"category_ids"`
+	VariantIDs      []uint                `bind:"variant_ids"`
+	ManufacturerID  uint                  `bind:"manufacturer_id"`
+	Status          string                `bind:"status"`
+	Images          []models.ProductImage `bind:"images" validate:"dive"`
 }
 
 type CREATE_Body struct {
@@ -29,8 +44,11 @@ func (instance CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMeta
 	bodyDTO := bindedBody.(CREATE_Body)
 
 	bodyDTO.Data.Name = strings.TrimSpace(bodyDTO.Data.Name)
+	bodyDTO.Data.MetaTitle = strings.TrimSpace(bodyDTO.Data.MetaTitle)
 	bodyDTO.Data.Slug = strings.TrimSpace(bodyDTO.Data.Slug)
-	bodyDTO.Data.Logo = strings.TrimSpace(bodyDTO.Data.Logo)
+	bodyDTO.Data.SKU = strings.TrimSpace(bodyDTO.Data.SKU)
+	bodyDTO.Data.CategoryIDs = utils.ArrToUnique(bodyDTO.Data.CategoryIDs)
+	bodyDTO.Data.VariantIDs = utils.ArrToUnique(bodyDTO.Data.VariantIDs)
 
 	fieldMap := make(map[string]gooh.FieldLevel)
 	for _, fl := range fls {

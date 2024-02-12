@@ -5,7 +5,7 @@ import (
 
 	"github.com/dangduoc08/ecommerce-api/categories/models"
 	"github.com/dangduoc08/ecommerce-api/constants"
-	dbProviders "github.com/dangduoc08/ecommerce-api/db/providers"
+	dbProviders "github.com/dangduoc08/ecommerce-api/dbs/providers"
 	"github.com/dangduoc08/ecommerce-api/utils"
 	"github.com/dangduoc08/gooh/core"
 	"gorm.io/gorm/clause"
@@ -16,16 +16,16 @@ type DBHandler struct {
 	DBValidation
 }
 
-func (self DBHandler) NewProvider() core.Provider {
-	return self
+func (instance DBHandler) NewProvider() core.Provider {
+	return instance
 }
 
-func (self DBHandler) FindByID(id uint) (*models.Category, error) {
+func (instance DBHandler) FindByID(id uint) (*models.Category, error) {
 	categoryRec := &models.Category{
 		ID: id,
 	}
 
-	if err := self.
+	if err := instance.
 		Preload("ParentCategories").
 		First(categoryRec).
 		Error; err != nil {
@@ -35,7 +35,7 @@ func (self DBHandler) FindByID(id uint) (*models.Category, error) {
 	return categoryRec, nil
 }
 
-func (self DBHandler) FindOneBy(query *Query) (*models.Category, error) {
+func (instance DBHandler) FindOneBy(query *Query) (*models.Category, error) {
 	categoryRec := &models.Category{}
 	categoryQueries := map[string]any{}
 
@@ -47,7 +47,7 @@ func (self DBHandler) FindOneBy(query *Query) (*models.Category, error) {
 		categoryQueries["store_id"] = query.StoreID
 	}
 
-	if err := self.
+	if err := instance.
 		Where(categoryQueries).
 		First(categoryRec).
 		Error; err != nil {
@@ -57,10 +57,10 @@ func (self DBHandler) FindOneBy(query *Query) (*models.Category, error) {
 	return categoryRec, nil
 }
 
-func (self DBHandler) FindManyBy(query *Query) ([]*models.Category, error) {
+func (instance DBHandler) FindManyBy(query *Query) ([]*models.Category, error) {
 	categoryRecs := []*models.Category{}
 	categoryQueries := map[string]any{}
-	tx := self.DB.DB
+	tx := instance.DB.DB
 
 	if query.StoreID != 0 {
 		categoryQueries["store_id"] = query.StoreID
@@ -90,7 +90,7 @@ func (self DBHandler) FindManyBy(query *Query) ([]*models.Category, error) {
 	return categoryRecs, nil
 }
 
-func (self DBHandler) CreateOne(data *Creation) (*models.Category, error) {
+func (instance DBHandler) CreateOne(data *Creation) (*models.Category, error) {
 	categoryRec := &models.Category{
 		Name:            data.Name,
 		Description:     data.Description,
@@ -101,13 +101,13 @@ func (self DBHandler) CreateOne(data *Creation) (*models.Category, error) {
 		Status:          data.Status,
 	}
 
-	if parentCategories, err := self.CheckParentCategories(data.ParentCategoryIDs); err != nil {
+	if parentCategories, err := instance.CheckParentCategories(data.ParentCategoryIDs); err != nil {
 		return nil, err
 	} else {
 		categoryRec.ParentCategories = parentCategories
 	}
 
-	if err := self.
+	if err := instance.
 		Create(&categoryRec).
 		Error; err != nil {
 		return nil, err
@@ -116,7 +116,7 @@ func (self DBHandler) CreateOne(data *Creation) (*models.Category, error) {
 	return categoryRec, nil
 }
 
-func (self DBHandler) UpdateByID(id uint, data *Update) (*models.Category, error) {
+func (instance DBHandler) UpdateByID(id uint, data *Update) (*models.Category, error) {
 	categoryRec := &models.Category{
 		ID:              id,
 		StoreID:         data.StoreID,
@@ -128,17 +128,17 @@ func (self DBHandler) UpdateByID(id uint, data *Update) (*models.Category, error
 		Status:          data.Status,
 	}
 
-	if parentCategories, err := self.CheckParentCategories(data.ParentCategoryIDs); err != nil {
+	if parentCategories, err := instance.CheckParentCategories(data.ParentCategoryIDs); err != nil {
 		return nil, err
 	} else {
 		categoryRec.ParentCategories = parentCategories
 	}
 
-	if err := self.CheckCategoryRelationship(id, data.ParentCategoryIDs); err != nil {
+	if err := instance.CheckCategoryRelationship(id, data.ParentCategoryIDs); err != nil {
 		return nil, err
 	}
 
-	tx := self.DB.Begin()
+	tx := instance.DB.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -149,7 +149,7 @@ func (self DBHandler) UpdateByID(id uint, data *Update) (*models.Category, error
 		return nil, err
 	}
 
-	currentParentCategoryIDs := self.FindCurrentParentCategoryIDs(id)
+	currentParentCategoryIDs := instance.FindCurrentParentCategoryIDs(id)
 	for _, currentParentCategoryID := range currentParentCategoryIDs {
 		if !utils.ArrIncludes(data.ParentCategoryIDs, currentParentCategoryID) {
 			if err := tx.Exec("DELETE FROM categories_categories WHERE parent_category_id = ?", currentParentCategoryID).Error; err != nil {
@@ -170,7 +170,7 @@ func (self DBHandler) UpdateByID(id uint, data *Update) (*models.Category, error
 	return categoryRec, tx.Commit().Error
 }
 
-func (self DBHandler) FindManyAsMenu(query *Query) (*[]map[string]any, error) {
+func (instance DBHandler) FindManyAsMenu(query *Query) (*[]map[string]any, error) {
 	menu := &[]map[string]any{}
 	args := []any{
 		constants.CATEGORY_ENABLED,
@@ -214,7 +214,7 @@ func (self DBHandler) FindManyAsMenu(query *Query) (*[]map[string]any, error) {
 		`
 	}
 
-	if err := self.
+	if err := instance.
 		Raw(
 			base+conditionals+"GROUP BY categories.id",
 			args...,
@@ -227,9 +227,9 @@ func (self DBHandler) FindManyAsMenu(query *Query) (*[]map[string]any, error) {
 	return menu, nil
 }
 
-func (self DBHandler) FindCurrentParentCategoryIDs(categoryID uint) []uint {
+func (instance DBHandler) FindCurrentParentCategoryIDs(categoryID uint) []uint {
 	categoryCategoryRecs := []*models.CategoryCategory{}
-	self.Raw("SELECT * FROM categories_categories WHERE category_id = ?", categoryID).Scan(&categoryCategoryRecs)
+	instance.Raw("SELECT * FROM categories_categories WHERE category_id = ?", categoryID).Scan(&categoryCategoryRecs)
 
 	return utils.ArrMap(categoryCategoryRecs, func(categoryCategoryRec *models.CategoryCategory, i int) uint {
 		return categoryCategoryRec.ParentCategoryID

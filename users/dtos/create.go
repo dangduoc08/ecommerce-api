@@ -25,11 +25,11 @@ type CREATE_Body struct {
 	Data CREATE_Body_Data `bind:"data"`
 }
 
-func (self CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
+func (instance CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	bindedStruct, fls := body.Bind(self)
+	bindedStruct, fls := body.Bind(instance)
 	bodyDTO := bindedStruct.(CREATE_Body)
 
 	bodyDTO.Data.Username = strings.TrimSpace(bodyDTO.Data.Username)

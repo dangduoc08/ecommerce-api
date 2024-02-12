@@ -13,11 +13,11 @@ type READ_categories_OF_BY_id_Param struct {
 	ID uint `bind:"id" validate:"required"`
 }
 
-func (self READ_categories_OF_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
+func (instance READ_categories_OF_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	paramDTO, fls := param.Bind(self)
+	paramDTO, fls := param.Bind(instance)
 
 	fieldMap := make(map[string]gooh.FieldLevel)
 	for _, fl := range fls {
@@ -47,7 +47,7 @@ type READ_categories_OF_BY_id_Query struct {
 	CategoryID uint `bind:"category_id"`
 }
 
-func (self READ_categories_OF_BY_id_Query) Transform(query gooh.Query, medata common.ArgumentMetadata) any {
-	queryDTO, _ := query.Bind(self)
+func (instance READ_categories_OF_BY_id_Query) Transform(query gooh.Query, medata common.ArgumentMetadata) any {
+	queryDTO, _ := query.Bind(instance)
 	return queryDTO
 }

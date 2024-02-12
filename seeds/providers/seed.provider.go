@@ -5,11 +5,12 @@ import (
 	authProviders "github.com/dangduoc08/ecommerce-api/auths/providers"
 	categoryModels "github.com/dangduoc08/ecommerce-api/categories/models"
 	"github.com/dangduoc08/ecommerce-api/constants"
-	dbProviders "github.com/dangduoc08/ecommerce-api/db/providers"
+	dbProviders "github.com/dangduoc08/ecommerce-api/dbs/providers"
 	groupModels "github.com/dangduoc08/ecommerce-api/groups/models"
 	locationModels "github.com/dangduoc08/ecommerce-api/locations/models"
 	locationProviders "github.com/dangduoc08/ecommerce-api/locations/providers"
 	manufacturerModels "github.com/dangduoc08/ecommerce-api/manufacturers/models"
+	productModels "github.com/dangduoc08/ecommerce-api/products/models"
 	storeModels "github.com/dangduoc08/ecommerce-api/stores/models"
 	storeProviders "github.com/dangduoc08/ecommerce-api/stores/providers"
 	userModels "github.com/dangduoc08/ecommerce-api/users/models"
@@ -31,71 +32,79 @@ type Seed struct {
 	AuthCipher         authProviders.Cipher
 }
 
-func (self Seed) NewProvider() core.Provider {
+func (instance Seed) NewProvider() core.Provider {
 
 	// Create user_status enum
-	self.CreateEnum(constants.USER_STATUS_FIELD_NAME, constants.USER_STATUSES)
+	instance.CreateEnum(constants.USER_STATUS_FIELD_NAME, constants.USER_STATUSES)
 
 	// Create category_status enum
-	self.CreateEnum(constants.CATEGORY_STATUS_FIELD_NAME, constants.CATEGORY_STATUSES)
+	instance.CreateEnum(constants.CATEGORY_STATUS_FIELD_NAME, constants.CATEGORY_STATUSES)
+
+	// Create category_status enum
+	instance.CreateEnum(constants.PRODUCT_STATUS_FIELD_NAME, constants.PRODUCT_STATUSES)
 
 	// Create tables
-	err := self.AutoMigrate(&locationModels.Location{})
+	err := instance.AutoMigrate(&locationModels.Location{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = self.AutoMigrate(&addressModels.Address{})
+	err = instance.AutoMigrate(&addressModels.Address{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = self.AutoMigrate(&storeModels.Store{})
+	err = instance.AutoMigrate(&storeModels.Store{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = self.AutoMigrate(&groupModels.Group{})
+	err = instance.AutoMigrate(&groupModels.Group{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = self.AutoMigrate(&userModels.User{})
+	err = instance.AutoMigrate(&userModels.User{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = self.AutoMigrate(&categoryModels.Category{})
+	err = instance.AutoMigrate(&categoryModels.Category{})
 	if err != nil {
 		panic(err)
 	}
 
-	err = self.AutoMigrate(&manufacturerModels.Manufacturer{})
+	err = instance.AutoMigrate(&manufacturerModels.Manufacturer{})
+	if err != nil {
+		panic(err)
+	}
+
+	err = instance.AutoMigrate(&productModels.Product{})
 	if err != nil {
 		panic(err)
 	}
 
 	// Seed locations
-	totalLocations := self.Count(constants.TABLE_LOCATION)
+	totalLocations := instance.Count(constants.TABLE_LOCATION)
 	if totalLocations == 0 {
-		self.LocationDBHandler.Seed(func(locationRec locationModels.Location) {
-			resp := self.Create(&locationRec)
+		instance.LocationDBHandler.Seed(func(locationRec locationModels.Location) {
+			resp := instance.Create(&locationRec)
 			if resp.Error != nil {
-				self.Logger.Debug("SeedLocations", "error", resp.Error)
+				instance.Logger.Debug("SeedLocations", "error", resp.Error)
 			}
 		})
 	}
 
 	// Seed users
-	hash, err := self.AuthCipher.HashPassword(self.ConfigService.Get("PASSWORD").(string))
+	hash, err := instance.AuthCipher.HashPassword(instance.ConfigService.Get("PASSWORD").(string))
 	if err != nil {
 		panic(err)
 	}
 	user := userModels.User{
-		Username:  self.ConfigService.Get("USERNAME").(string),
-		Email:     self.ConfigService.Get("EMAIL").(string),
-		FirstName: self.ConfigService.Get("FIRST_NAME").(string),
-		LastName:  self.ConfigService.Get("LAST_NAME").(string),
+		Username:  instance.ConfigService.Get("USERNAME").(string),
+		Email:     instance.ConfigService.Get("EMAIL").(string),
+		FirstName: instance.ConfigService.Get("FIRST_NAME").(string),
+		LastName:  instance.ConfigService.Get("LAST_NAME").(string),
 		Hash:      hash,
 		Status:    userModels.UserStatus(constants.USER_ACTIVE),
 		Groups: []*groupModels.Group{
@@ -108,17 +117,17 @@ func (self Seed) NewProvider() core.Provider {
 	}
 
 	// Seed stores
-	totalStores := self.Count(constants.TABLE_STORE)
+	totalStores := instance.Count(constants.TABLE_STORE)
 	if totalStores == 0 {
-		resp := self.Create(&storeModels.Store{
+		resp := instance.Create(&storeModels.Store{
 			Name:      "Demo",
 			Addresses: []addressModels.Address{},
 			Users:     []userModels.User{user},
 		})
 		if resp.Error != nil {
-			self.Logger.Debug("SeedStores", "error", resp.Error)
+			instance.Logger.Debug("SeedStores", "error", resp.Error)
 		}
 	}
 
-	return self
+	return instance
 }

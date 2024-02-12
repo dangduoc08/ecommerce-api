@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/dangduoc08/ecommerce-api/constants"
-	dbProviders "github.com/dangduoc08/ecommerce-api/db/providers"
+	dbProviders "github.com/dangduoc08/ecommerce-api/dbs/providers"
 	"github.com/dangduoc08/ecommerce-api/manufacturers/models"
 	"github.com/dangduoc08/gooh/core"
 	"gorm.io/gorm/clause"
@@ -14,16 +14,16 @@ type DBHandler struct {
 	dbProviders.DB
 }
 
-func (self DBHandler) NewProvider() core.Provider {
-	return self
+func (instance DBHandler) NewProvider() core.Provider {
+	return instance
 }
 
-func (self DBHandler) FindByID(id uint) (*models.Manufacturer, error) {
+func (instance DBHandler) FindByID(id uint) (*models.Manufacturer, error) {
 	manufacturerRec := &models.Manufacturer{
 		ID: id,
 	}
 
-	if err := self.
+	if err := instance.
 		First(manufacturerRec).
 		Error; err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (self DBHandler) FindByID(id uint) (*models.Manufacturer, error) {
 	return manufacturerRec, nil
 }
 
-func (self DBHandler) FindOneBy(query *Query) (*models.Manufacturer, error) {
+func (instance DBHandler) FindOneBy(query *Query) (*models.Manufacturer, error) {
 	manufacturerRec := &models.Manufacturer{}
 	manufacturerQueries := map[string]any{}
 
@@ -44,7 +44,7 @@ func (self DBHandler) FindOneBy(query *Query) (*models.Manufacturer, error) {
 		manufacturerQueries["store_id"] = query.StoreID
 	}
 
-	if err := self.
+	if err := instance.
 		Where(manufacturerQueries).
 		First(manufacturerRec).
 		Error; err != nil {
@@ -54,10 +54,10 @@ func (self DBHandler) FindOneBy(query *Query) (*models.Manufacturer, error) {
 	return manufacturerRec, nil
 }
 
-func (self DBHandler) FindManyBy(query *Query) ([]*models.Manufacturer, error) {
+func (instance DBHandler) FindManyBy(query *Query) ([]*models.Manufacturer, error) {
 	manufacturerRecs := []*models.Manufacturer{}
 	manufacturerQueries := map[string]any{}
-	tx := self.DB.DB
+	tx := instance.DB.DB
 
 	if query.StoreID != 0 {
 		manufacturerQueries["store_id"] = query.StoreID
@@ -82,7 +82,7 @@ func (self DBHandler) FindManyBy(query *Query) ([]*models.Manufacturer, error) {
 	return manufacturerRecs, nil
 }
 
-func (self DBHandler) CreateOne(data *Creation) (*models.Manufacturer, error) {
+func (instance DBHandler) CreateOne(data *Creation) (*models.Manufacturer, error) {
 	manufacturerRec := &models.Manufacturer{
 		Name:    data.Name,
 		Logo:    data.Logo,
@@ -90,7 +90,7 @@ func (self DBHandler) CreateOne(data *Creation) (*models.Manufacturer, error) {
 		Slug:    data.Slug,
 	}
 
-	if err := self.
+	if err := instance.
 		Create(&manufacturerRec).
 		Error; err != nil {
 		return nil, err
@@ -99,7 +99,7 @@ func (self DBHandler) CreateOne(data *Creation) (*models.Manufacturer, error) {
 	return manufacturerRec, nil
 }
 
-func (self DBHandler) UpdateByID(id uint, data *Update) (*models.Manufacturer, error) {
+func (instance DBHandler) UpdateByID(id uint, data *Update) (*models.Manufacturer, error) {
 	manufacturerRec := &models.Manufacturer{
 		ID:   id,
 		Name: data.Name,
@@ -107,7 +107,7 @@ func (self DBHandler) UpdateByID(id uint, data *Update) (*models.Manufacturer, e
 		Slug: data.Slug,
 	}
 
-	if err := self.
+	if err := instance.
 		Clauses(clause.Returning{}).
 		Updates(&manufacturerRec).
 		Error; err != nil {

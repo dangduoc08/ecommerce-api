@@ -20,21 +20,21 @@ type CREATE_files_Body struct {
 	Dir  string
 }
 
-func (self CREATE_files_Body) Transform(c gooh.Context, medata common.ArgumentMetadata) any {
+func (instance CREATE_files_Body) Transform(c gooh.Context, medata common.ArgumentMetadata) any {
 	currentDir, _ := os.Getwd()
-	dir := self.CleanDir(c.Form().Get("dir"))
-	self.Dir = filepath.Join(currentDir, "public", dir)
+	dir := instance.CleanDir(c.Form().Get("dir"))
+	instance.Dir = filepath.Join(currentDir, "publics", dir)
 
-	return c.File().Bind(self)
+	return c.File().Bind(instance)
 }
 
-func (self CREATE_files_Body) IsValid(dataFile *ctx.DataFile) bool {
+func (instance CREATE_files_Body) IsValid(dataFile *ctx.DataFile) bool {
 	return strings.HasPrefix(dataFile.Type, "image")
 }
 
-func (self CREATE_files_Body) Store(dataFile *ctx.DataFile, src multipart.File) {
-	uploadPath := filepath.Join(self.Dir, dataFile.Filename)
-	uploadPath = self.GeneratePath(uploadPath, 1)
+func (instance CREATE_files_Body) Store(dataFile *ctx.DataFile, src multipart.File) {
+	uploadPath := filepath.Join(instance.Dir, dataFile.Filename)
+	uploadPath = instance.GeneratePath(uploadPath, 1)
 
 	dst, err := os.Create(uploadPath)
 	if err != nil {

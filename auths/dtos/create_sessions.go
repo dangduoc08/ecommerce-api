@@ -19,11 +19,11 @@ type CREATE_sessions_Body struct {
 	Data CREATE_sessions_Body_Data `bind:"data"`
 }
 
-func (self CREATE_sessions_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
+func (instance CREATE_sessions_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	bindedStruct, fls := body.Bind(self)
+	bindedStruct, fls := body.Bind(instance)
 	bodyDTO := bindedStruct.(CREATE_sessions_Body)
 
 	fieldMap := make(map[string]gooh.FieldLevel)

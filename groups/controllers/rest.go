@@ -18,23 +18,23 @@ type REST struct {
 	providers.DBHandler
 }
 
-func (self REST) NewController() core.Controller {
-	self.
+func (instance REST) NewController() core.Controller {
+	instance.
 		Prefix("v1").
 		Prefix("groups")
 
-	self.
+	instance.
 		BindGuard(shared.AuthGuard{})
 
-	return self
+	return instance
 }
 
-func (self REST) READ(
+func (instance REST) READ(
 	ctx gooh.Context,
 	queryDTO dtos.READ_Query,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 ) []*models.Group {
-	groups, err := self.FindManyBy(&providers.Query{
+	groups, err := instance.FindManyBy(&providers.Query{
 		StoreID: tokenClaimsDTO.StoreID,
 		Sort:    queryDTO.Sort,
 		Order:   queryDTO.Order,
@@ -43,7 +43,7 @@ func (self REST) READ(
 	})
 
 	if err != nil {
-		self.Logger.Debug(
+		instance.Logger.Debug(
 			"READ.GroupDB.FindManyBy",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -54,19 +54,19 @@ func (self REST) READ(
 	return groups
 }
 
-func (self REST) CREATE(
+func (instance REST) CREATE(
 	ctx gooh.Context,
 	bodyDTO dtos.CREATE_Body,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 ) *models.Group {
-	group, err := self.CreateOne(&providers.Creation{
+	group, err := instance.CreateOne(&providers.Creation{
 		Name:        bodyDTO.Data.Name,
 		Permissions: bodyDTO.Data.Permissions,
 		StoreID:     tokenClaimsDTO.StoreID,
 	})
 
 	if err != nil {
-		self.Logger.Debug(
+		instance.Logger.Debug(
 			"CREATE.GroupDB.CreateOne",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -77,13 +77,13 @@ func (self REST) CREATE(
 	return group
 }
 
-func (self REST) UPDATE_BY_id(
+func (instance REST) UPDATE_BY_id(
 	ctx gooh.Context,
 	paramDTO dtos.UPDATE_BY_id_Param,
 	bodyDTO dtos.UPDATE_BY_id_Body,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 ) *models.Group {
-	group, err := self.FindOneBy(&providers.Query{
+	group, err := instance.FindOneBy(&providers.Query{
 		ID:      paramDTO.ID,
 		StoreID: tokenClaimsDTO.StoreID,
 	})
@@ -92,13 +92,13 @@ func (self REST) UPDATE_BY_id(
 		panic(exception.NotFoundException(err.Error()))
 	}
 
-	group, err = self.UpdateByID(paramDTO.ID, &providers.Update{
+	group, err = instance.UpdateByID(paramDTO.ID, &providers.Update{
 		Name:        bodyDTO.Data.Name,
 		Permissions: bodyDTO.Data.Permissions,
 		StoreID:     tokenClaimsDTO.StoreID,
 	})
 	if err != nil {
-		self.Logger.Debug(
+		instance.Logger.Debug(
 			"UPDATE_BY_id.UpdateByID",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -109,18 +109,18 @@ func (self REST) UPDATE_BY_id(
 	return group
 }
 
-func (self REST) DELETE_BY_id(
+func (instance REST) DELETE_BY_id(
 	ctx gooh.Context,
 	paramDTO dtos.DELETE_BY_id_Param,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 ) gooh.Map {
-	_, err := self.FindOneBy(&providers.Query{
+	_, err := instance.FindOneBy(&providers.Query{
 		ID:      paramDTO.ID,
 		StoreID: tokenClaimsDTO.StoreID,
 	})
 
 	if err != nil {
-		self.Logger.Debug(
+		instance.Logger.Debug(
 			"DELETE_BY_id.FindOneBy",
 			"error", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -130,8 +130,8 @@ func (self REST) DELETE_BY_id(
 		}
 	}
 
-	if err := self.DeleteByID(paramDTO.ID); err != nil {
-		self.Logger.Debug(
+	if err := instance.DeleteByID(paramDTO.ID); err != nil {
+		instance.Logger.Debug(
 			"DELETE_BY_id.DeleteByID",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),

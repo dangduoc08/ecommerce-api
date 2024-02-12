@@ -12,7 +12,7 @@ import (
 )
 
 type READ_Query struct {
-	Status string `bind:"status" validate:"categoryStatus"`
+	Status string `bind:"status" validate:"productStatus"`
 	Sort   string `bind:"sort"`
 	Order  string `bind:"order" validate:"order"`
 	Limit  int    `bind:"limit" validate:"gte=0,lte=100"`
@@ -31,7 +31,7 @@ func (instance READ_Query) Transform(query gooh.Query, medata common.ArgumentMet
 		fieldMap[fl.Field()] = fl
 	}
 
-	validate.RegisterValidation("categoryStatus", validators.ValidateEnum(constants.CATEGORY_STATUSES, func(fieldErr validator.FieldError) {
+	validate.RegisterValidation("productStatus", validators.ValidateEnum(constants.PRODUCT_STATUSES, func(fieldErr validator.FieldError) {
 		if fieldErr != nil {
 			fl := fieldMap[fieldErr.Field()]
 			errMsgs = append(errMsgs, map[string]any{

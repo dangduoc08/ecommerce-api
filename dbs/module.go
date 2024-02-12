@@ -1,4 +1,4 @@
-package db
+package dbs
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"time"
 
 	conf "github.com/dangduoc08/ecommerce-api/confs"
-	"github.com/dangduoc08/ecommerce-api/db/providers"
+	"github.com/dangduoc08/ecommerce-api/dbs/providers"
 	"github.com/dangduoc08/gooh/common"
 	"github.com/dangduoc08/gooh/core"
 	"gorm.io/driver/postgres"
@@ -20,31 +20,31 @@ type GormLogger struct {
 	common.Logger
 }
 
-func (self *GormLogger) LogMode(logLevel gormLogger.LogLevel) gormLogger.Interface {
-	return self
+func (instance *GormLogger) LogMode(logLevel gormLogger.LogLevel) gormLogger.Interface {
+	return instance
 }
 
-func (self *GormLogger) Info(c context.Context, msg string, data ...any) {
-	self.Logger.Info(msg, data)
+func (instance *GormLogger) Info(c context.Context, msg string, data ...any) {
+	instance.Logger.Info(msg, data)
 }
 
-func (self *GormLogger) Warn(c context.Context, msg string, data ...any) {
-	self.Logger.Warn(msg, data)
+func (instance *GormLogger) Warn(c context.Context, msg string, data ...any) {
+	instance.Logger.Warn(msg, data)
 }
 
-func (self *GormLogger) Error(c context.Context, msg string, data ...any) {
-	self.Logger.Error(msg, data)
+func (instance *GormLogger) Error(c context.Context, msg string, data ...any) {
+	instance.Logger.Error(msg, data)
 }
 
-func (self *GormLogger) Trace(c context.Context, begin time.Time, cb func() (sql string, rowsAffected int64), err error) {
+func (instance *GormLogger) Trace(c context.Context, begin time.Time, cb func() (sql string, rowsAffected int64), err error) {
 	sql, rowsAffected := cb()
 	sql = regexp.MustCompile(`\s+`).ReplaceAllString(sql, " ")
 	sql = strings.TrimSpace(sql)
 
 	if err != nil {
-		self.Logger.Error(err.Error(), "sql", sql, "rowsAffected", rowsAffected)
+		instance.Logger.Error(err.Error(), "sql", sql, "rowsAffected", rowsAffected)
 	} else {
-		self.Logger.Debug("GORM", "sql", sql, "rowsAffected", rowsAffected)
+		instance.Logger.Debug("GORM", "sql", sql, "rowsAffected", rowsAffected)
 	}
 }
 

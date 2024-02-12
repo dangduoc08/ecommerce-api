@@ -3,7 +3,7 @@ package providers
 import (
 	"time"
 
-	dbProviders "github.com/dangduoc08/ecommerce-api/db/providers"
+	dbProviders "github.com/dangduoc08/ecommerce-api/dbs/providers"
 	groupModels "github.com/dangduoc08/ecommerce-api/groups/models"
 	groupProviders "github.com/dangduoc08/ecommerce-api/groups/providers"
 	"github.com/dangduoc08/ecommerce-api/utils"
@@ -21,11 +21,11 @@ type Cipher struct {
 	groupProviders.DBHandler
 }
 
-func (self Cipher) NewProvider() core.Provider {
-	return self
+func (instance Cipher) NewProvider() core.Provider {
+	return instance
 }
 
-func (self Cipher) HashPassword(password string) (string, error) {
+func (instance Cipher) HashPassword(password string) (string, error) {
 	var passwordBytes = []byte(password)
 
 	hashedPasswordBytes, err := bcrypt.
@@ -38,18 +38,18 @@ func (self Cipher) HashPassword(password string) (string, error) {
 	return string(hashedPasswordBytes), nil
 }
 
-func (self Cipher) CheckHash(password, hash string) bool {
+func (instance Cipher) CheckHash(password, hash string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
 }
 
-func (self Cipher) SignToken(claims jwt.MapClaims, key string, expIn int) (string, error) {
+func (instance Cipher) SignToken(claims jwt.MapClaims, key string, expIn int) (string, error) {
 	claims["exp"] = time.Now().Unix() + int64(expIn)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	return token.SignedString([]byte(key))
 }
 
-func (self Cipher) GetUserPermissions(grs []*groupModels.Group) []string {
+func (instance Cipher) GetUserPermissions(grs []*groupModels.Group) []string {
 	permissions := []string{}
 
 	for _, gr := range grs {

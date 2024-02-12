@@ -15,11 +15,11 @@ type UPDATE_BY_id_Param struct {
 	ID uint `bind:"id" validate:"required"`
 }
 
-func (self UPDATE_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
+func (instance UPDATE_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	paramDTO, fls := param.Bind(self)
+	paramDTO, fls := param.Bind(instance)
 
 	fieldMap := make(map[string]gooh.FieldLevel)
 	for _, fl := range fls {
@@ -46,7 +46,7 @@ func (self UPDATE_BY_id_Param) Transform(param gooh.Param, medata common.Argumen
 }
 
 type UPDATE_BY_id_Body_Data struct {
-	Name string `bind:"name" validate:"required,gte=5"`
+	Name string `bind:"name" validate:"required,gte=1"`
 	Slug string `bind:"slug" validate:"required,gte=1,slug"`
 	Logo string `bind:"logo" validate:"omitempty,http_url"`
 }
@@ -55,11 +55,11 @@ type UPDATE_BY_id_Body struct {
 	Data UPDATE_BY_id_Body_Data `bind:"data"`
 }
 
-func (self UPDATE_BY_id_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
+func (instance UPDATE_BY_id_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 	validate := validator.New()
 
-	bindedBody, fls := body.Bind(self)
+	bindedBody, fls := body.Bind(instance)
 	bodyDTO := bindedBody.(UPDATE_BY_id_Body)
 
 	bodyDTO.Data.Name = strings.TrimSpace(bodyDTO.Data.Name)

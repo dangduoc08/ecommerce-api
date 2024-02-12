@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	dbProviders "github.com/dangduoc08/ecommerce-api/db/providers"
+	dbProviders "github.com/dangduoc08/ecommerce-api/dbs/providers"
 	"github.com/dangduoc08/ecommerce-api/locations/models"
 	"github.com/dangduoc08/gooh/core"
 	"github.com/dangduoc08/gooh/modules/config"
@@ -16,11 +16,11 @@ type DBHandler struct {
 	config.ConfigService
 }
 
-func (self DBHandler) NewProvider() core.Provider {
-	return self
+func (instance DBHandler) NewProvider() core.Provider {
+	return instance
 }
 
-func (self DBHandler) Seed(cb func(models.Location)) {
+func (instance DBHandler) Seed(cb func(models.Location)) {
 	dir, _ := os.Getwd()
 	data, err := os.ReadFile(fmt.Sprintf("%v/seeds/datas/%v", dir, "locations.json"))
 	var locationList []map[string]any
@@ -56,20 +56,20 @@ func (self DBHandler) Seed(cb func(models.Location)) {
 	}
 }
 
-func (self DBHandler) FindByID(id uint) (*models.Location, error) {
+func (instance DBHandler) FindByID(id uint) (*models.Location, error) {
 	locationRec := &models.Location{
 		ID: id,
 	}
 
-	resp := self.First(locationRec)
+	resp := instance.First(locationRec)
 
 	return locationRec, resp.Error
 }
 
-func (self DBHandler) FindManyBy(query *Query) ([]*models.Location, error) {
+func (instance DBHandler) FindManyBy(query *Query) ([]*models.Location, error) {
 	var locations []*models.Location
 
-	resp := self.
+	resp := instance.
 		Select("id", "location_id", "name", "slug").
 		Where("location_id", query.LocationID).
 		Find(&locations)

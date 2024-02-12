@@ -15,11 +15,11 @@ type MODIFY_statuses_OF_BY_id_Param struct {
 	ID uint `bind:"id" validate:"required"`
 }
 
-func (self MODIFY_statuses_OF_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
+func (instance MODIFY_statuses_OF_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	paramDTO, fls := param.Bind(self)
+	paramDTO, fls := param.Bind(instance)
 
 	fieldMap := make(map[string]gooh.FieldLevel)
 	for _, fl := range fls {
@@ -53,11 +53,11 @@ type MODIFY_statuses_OF_BY_id struct {
 	Data MODIFY_statuses_OF_BY_id_Data `bind:"data"`
 }
 
-func (self MODIFY_statuses_OF_BY_id) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
+func (instance MODIFY_statuses_OF_BY_id) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	bindedStruct, fls := body.Bind(self)
+	bindedStruct, fls := body.Bind(instance)
 	bodyDTO := bindedStruct.(MODIFY_statuses_OF_BY_id)
 
 	fieldMap := make(map[string]gooh.FieldLevel)

@@ -14,10 +14,10 @@ import (
 )
 
 type CREATE_Body_Data struct {
-	Name              string `bind:"name" validate:"required,gte=5"`
+	Name              string `bind:"name" validate:"required,gte=1"`
 	Description       string `bind:"description"`
-	MetaTitle         string `bind:"meta_title" validate:"required,gte=5"`
-	MetaDescription   string `bind:"meta_description"`
+	MetaTitle         string `bind:"meta_title" validate:"required,gte=1"`
+	MetaDescription   string `bind:"meta_description" validate:"lte=160"`
 	Slug              string `bind:"slug" validate:"required,gte=1,slug"`
 	Status            string `bind:"status" validate:"required,categoryStatus"`
 	ParentCategoryIDs []uint `bind:"parent_category_ids"`
@@ -27,11 +27,11 @@ type CREATE_Body struct {
 	Data CREATE_Body_Data `bind:"data"`
 }
 
-func (self CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
+func (instance CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 	validate := validator.New()
 
-	bindedBody, fls := body.Bind(self)
+	bindedBody, fls := body.Bind(instance)
 	bodyDTO := bindedBody.(CREATE_Body)
 
 	bodyDTO.Data.Name = strings.TrimSpace(bodyDTO.Data.Name)

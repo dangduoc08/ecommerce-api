@@ -16,15 +16,15 @@ type REST struct {
 	providers.DBHandler
 }
 
-func (self REST) NewController() core.Controller {
-	self.
+func (instance REST) NewController() core.Controller {
+	instance.
 		Prefix("v1").
 		Prefix("locations")
 
-	return self
+	return instance
 }
 
-func (self REST) READ(
+func (instance REST) READ(
 	ctx gooh.Context,
 	query gooh.Query,
 ) []*models.Location {
@@ -38,11 +38,11 @@ func (self REST) READ(
 		}
 	}
 
-	locations, err := self.FindManyBy(&providers.Query{
+	locations, err := instance.FindManyBy(&providers.Query{
 		LocationID: locationID,
 	})
 	if err != nil {
-		self.Logger.Debug(
+		instance.Logger.Debug(
 			"READ.FindManyBy",
 			"error", err.Error(),
 			"X-Request-ID", ctx.GetID(),

@@ -5,16 +5,16 @@ import (
 	"strings"
 )
 
-type Permission []string
+type Permissions []string
 
-func (permission *Permission) Scan(src any) error {
-	*permission = strings.Split(src.(string), ",")
+func (permissions *Permissions) Scan(src any) error {
+	*permissions = strings.Split(src.(string), ",")
 	return nil
 }
 
-func (permission Permission) Value() (driver.Value, error) {
-	if len(permission) == 0 {
+func (permissions Permissions) Value() (driver.Value, error) {
+	if len(permissions) == 0 {
 		return nil, nil
 	}
-	return strings.Join(permission, ","), nil
+	return strings.Join(permissions, ","), nil
 }

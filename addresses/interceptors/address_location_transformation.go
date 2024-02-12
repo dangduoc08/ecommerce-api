@@ -12,7 +12,7 @@ import (
 
 type AddressLocationTransformation struct{}
 
-func (self AddressLocationTransformation) transformLocationObjToArr(
+func (instance AddressLocationTransformation) transformLocationObjToArr(
 	location *locationModels.Location,
 	locationArr []*locationModels.Location,
 ) []*locationModels.Location {
@@ -28,13 +28,13 @@ func (self AddressLocationTransformation) transformLocationObjToArr(
 	)
 
 	if location.Location != nil {
-		return self.transformLocationObjToArr(location.Location, locationArr)
+		return instance.transformLocationObjToArr(location.Location, locationArr)
 	}
 
 	return locationArr
 }
 
-func (self AddressLocationTransformation) toResponseObj(address *models.Address) gooh.Map {
+func (instance AddressLocationTransformation) toResponseObj(address *models.Address) gooh.Map {
 	respData := gooh.Map{
 		"id":          address.ID,
 		"street_name": address.StreetName,
@@ -43,7 +43,7 @@ func (self AddressLocationTransformation) toResponseObj(address *models.Address)
 	}
 
 	if address.Location != nil {
-		locationArr := self.transformLocationObjToArr(address.Location, []*locationModels.Location{})
+		locationArr := instance.transformLocationObjToArr(address.Location, []*locationModels.Location{})
 		respData["locations"] = locationArr
 	} else {
 		respData["locations"] = []any{}
@@ -52,18 +52,18 @@ func (self AddressLocationTransformation) toResponseObj(address *models.Address)
 	return respData
 }
 
-func (self AddressLocationTransformation) Intercept(c gooh.Context, aggregation gooh.Aggregation) any {
+func (instance AddressLocationTransformation) Intercept(c gooh.Context, aggregation gooh.Aggregation) any {
 	return aggregation.Pipe(
 		aggregation.Consume(func(c gooh.Context, data any) any {
 			if !reflect.ValueOf(data).IsNil() {
 				switch address := data.(type) {
 
 				case *models.Address:
-					return self.toResponseObj(address)
+					return instance.toResponseObj(address)
 
 				case []*models.Address:
 					return utils.ArrMap[*models.Address, gooh.Map](address, func(address *models.Address, i int) ctx.Map {
-						return self.toResponseObj(address)
+						return instance.toResponseObj(address)
 					})
 				}
 			}

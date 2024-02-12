@@ -11,7 +11,7 @@ import (
 
 type SubCategoryTransformation struct{}
 
-func (self SubCategoryTransformation) Intercept(c gooh.Context, aggregation gooh.Aggregation) any {
+func (instance SubCategoryTransformation) Intercept(c gooh.Context, aggregation gooh.Aggregation) any {
 	return aggregation.Pipe(
 		aggregation.Consume(func(c gooh.Context, data any) any {
 			if !reflect.ValueOf(data).IsNil() {

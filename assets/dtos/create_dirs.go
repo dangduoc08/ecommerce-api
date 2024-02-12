@@ -20,11 +20,11 @@ type CREATE_dirs_Body struct {
 	Data CREATE_dirs_Body_Data `bind:"data"`
 }
 
-func (self CREATE_dirs_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
+func (instance CREATE_dirs_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	dto, fls := body.Bind(self)
+	dto, fls := body.Bind(instance)
 	bodyDTO := dto.(CREATE_dirs_Body)
 	bodyDTO.Data.Dir = strings.TrimSpace(bodyDTO.Data.Dir)
 
@@ -49,7 +49,7 @@ func (self CREATE_dirs_Body) Transform(body gooh.Body, medata common.ArgumentMet
 		panic(exception.UnprocessableEntityException(errMsgs))
 	}
 
-	bodyDTO.Data.Dir = self.CleanDir(bodyDTO.Data.Dir)
+	bodyDTO.Data.Dir = instance.CleanDir(bodyDTO.Data.Dir)
 
 	return bodyDTO
 }

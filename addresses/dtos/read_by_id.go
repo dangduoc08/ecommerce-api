@@ -13,11 +13,11 @@ type READ_BY_id_Param struct {
 	ID uint `bind:"id"`
 }
 
-func (self READ_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
+func (instance READ_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	paramDTO, fls := param.Bind(self)
+	paramDTO, fls := param.Bind(instance)
 
 	fieldMap := make(map[string]gooh.FieldLevel)
 	for _, fl := range fls {

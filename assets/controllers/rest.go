@@ -22,26 +22,37 @@ type REST struct {
 	PublicPath string
 }
 
-func (self REST) NewController() core.Controller {
-	self.
+func (instance REST) NewController() core.Controller {
+	instance.
 		Prefix("v1").
-		Prefix("assets")
+		Prefix(
+			"assets",
+			instance.READ,
+			instance.CREATE_dirs,
+			instance.CREATE_files,
+			instance.MODIFY_dirs,
+			instance.DELETE,
+		).
+		Prefix(
+			"publics",
+			instance.SERVE_ANY,
+		)
 
-	self.BindGuard(
+	instance.BindGuard(
 		shared.AuthGuard{},
 	)
 
-	return self
+	return instance
 }
 
-func (self REST) READ(
+func (instance REST) READ(
 	ctx gooh.Context,
 	queryDTO dtos.READ_Query,
 ) []*models.Asset {
-	ls, err := self.List(self.PublicPath + queryDTO.Dir)
+	ls, err := instance.List(instance.PublicPath + queryDTO.Dir)
 
 	if err != nil {
-		self.Debug(
+		instance.Debug(
 			"READ.List",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -53,14 +64,14 @@ func (self REST) READ(
 	return ls
 }
 
-func (self REST) CREATE_dirs(
+func (instance REST) CREATE_dirs(
 	ctx gooh.Context,
 	bodyDTO dtos.CREATE_dirs_Body,
 ) gooh.Map {
-	dir, err := self.Mkdir(self.PublicPath, bodyDTO.Data.Dir)
+	dir, err := instance.Mkdir(instance.PublicPath, bodyDTO.Data.Dir)
 
 	if err != nil {
-		self.Debug(
+		instance.Debug(
 			"CREATE_dirs.Mkdir",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -73,7 +84,7 @@ func (self REST) CREATE_dirs(
 	}
 }
 
-func (self REST) CREATE_files(
+func (instance REST) CREATE_files(
 	fileBodyDTO dtos.CREATE_files_Body,
 ) gooh.Map {
 	if fileBodyDTO.File.Dest == "" {
@@ -83,7 +94,7 @@ func (self REST) CREATE_files(
 		}
 	}
 
-	dir := strings.Replace(fileBodyDTO.File.Dest, self.PublicPath, "", 1)
+	dir := strings.Replace(fileBodyDTO.File.Dest, instance.PublicPath, "", 1)
 	if dir != "" {
 		dir = dir[1:]
 	}
@@ -94,11 +105,11 @@ func (self REST) CREATE_files(
 	}
 }
 
-func (self REST) MODIFY_names(
+func (instance REST) MODIFY_dirs(
 	ctx gooh.Context,
 	bodyDTO dtos.MODIFY_Body,
 ) gooh.Map {
-	if err := os.Rename(self.PublicPath+bodyDTO.Data.OldDir, self.PublicPath+bodyDTO.Data.NewDir); err != nil {
+	if err := os.Rename(instance.PublicPath+bodyDTO.Data.OldDir, instance.PublicPath+bodyDTO.Data.NewDir); err != nil {
 		panic(exception.InternalServerErrorException(err.Error()))
 	}
 
@@ -111,13 +122,13 @@ func (self REST) MODIFY_names(
 	}
 }
 
-func (self REST) DELETE(
+func (instance REST) DELETE(
 	ctx gooh.Context,
 	queryDTO dtos.DELETE_Query,
 ) gooh.Map {
 	for _, dir := range queryDTO.Dirs {
 		if dir != "/" {
-			if err := os.RemoveAll(self.PublicPath + dir); err != nil {
+			if err := os.RemoveAll(instance.PublicPath + dir); err != nil {
 				panic(exception.InternalServerErrorException(err.Error()))
 			}
 		}
@@ -126,4 +137,8 @@ func (self REST) DELETE(
 	return gooh.Map{
 		"deleted": true,
 	}
+}
+
+func (instance REST) SERVE_ANY() string {
+	return instance.PublicPath
 }

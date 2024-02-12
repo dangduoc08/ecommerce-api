@@ -32,35 +32,35 @@ type REST struct {
 	JWTRefreshTokenKey   string
 }
 
-func (self REST) NewController() core.Controller {
-	self.
+func (instance REST) NewController() core.Controller {
+	instance.
 		Prefix("v1").
 		Prefix("auths")
 
-	self.
+	instance.
 		BindGuard(
 			guards.TokenRefresh{},
-			self.CREATE_tokens,
+			instance.CREATE_tokens,
 		)
 
-	self.JWTAccessAPIKey = self.Get("JWT_ACCESS_API_KEY").(string)
-	self.JWTAccessAPIExpIn = self.Get("JWT_ACCESS_API_EXP_IN").(int)
-	self.JWTRefreshTokenKey = self.Get("JWT_REFRESH_TOKEN_KEY").(string)
-	self.JWTRefreshTokenExpIn = self.Get("JWT_REFRESH_TOKEN_EXP_IN").(int)
+	instance.JWTAccessAPIKey = instance.Get("JWT_ACCESS_API_KEY").(string)
+	instance.JWTAccessAPIExpIn = instance.Get("JWT_ACCESS_API_EXP_IN").(int)
+	instance.JWTRefreshTokenKey = instance.Get("JWT_REFRESH_TOKEN_KEY").(string)
+	instance.JWTRefreshTokenExpIn = instance.Get("JWT_REFRESH_TOKEN_EXP_IN").(int)
 
-	return self
+	return instance
 }
 
-func (self REST) CREATE_sessions(
+func (instance REST) CREATE_sessions(
 	ctx gooh.Context,
 	bodyDTO dtos.CREATE_sessions_Body,
 ) gooh.Map {
-	user, err := self.FindOneBy(&userProviders.Query{
+	user, err := instance.FindOneBy(&userProviders.Query{
 		Username: bodyDTO.Data.Username,
 	})
 
 	if err != nil {
-		self.Error(
+		instance.Error(
 			"CREATE_sessions.FindOneBy",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -73,13 +73,13 @@ func (self REST) CREATE_sessions(
 		panic(exception.UnauthorizedException(fmt.Sprintf("user'status is %v", user.Status)))
 	}
 
-	if !self.CheckHash(bodyDTO.Data.Password, user.Hash) {
+	if !instance.CheckHash(bodyDTO.Data.Password, user.Hash) {
 		panic(exception.UnauthorizedException("password not match"))
 	}
 
-	permissions := self.GetUserPermissions(user.Groups)
+	permissions := instance.GetUserPermissions(user.Groups)
 
-	accessToken, err := self.SignToken(
+	accessToken, err := instance.SignToken(
 		jwt.MapClaims{
 			"id":          user.ID,
 			"store_id":    user.StoreID,
@@ -88,11 +88,11 @@ func (self REST) CREATE_sessions(
 			"email":       user.Email,
 			"permissions": permissions,
 		},
-		self.JWTAccessAPIKey,
-		self.JWTAccessAPIExpIn,
+		instance.JWTAccessAPIKey,
+		instance.JWTAccessAPIExpIn,
 	)
 	if err != nil {
-		self.Error(
+		instance.Error(
 			"UserProvider.SignToken",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -100,16 +100,16 @@ func (self REST) CREATE_sessions(
 		panic(exception.InternalServerErrorException(err.Error()))
 	}
 
-	refreshToken, err := self.SignToken(
+	refreshToken, err := instance.SignToken(
 		jwt.MapClaims{
 			"id":       user.ID,
 			"store_id": user.StoreID,
 		},
-		self.JWTRefreshTokenKey,
-		self.JWTRefreshTokenExpIn,
+		instance.JWTRefreshTokenKey,
+		instance.JWTRefreshTokenExpIn,
 	)
 	if err != nil {
-		self.Error(
+		instance.Error(
 			"UserProvider.SignToken",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -131,15 +131,15 @@ func (self REST) CREATE_sessions(
 	}
 }
 
-func (self REST) CREATE_tokens(
+func (instance REST) CREATE_tokens(
 	ctx gooh.Context,
 ) gooh.Map {
 	tokenClaims := ctx.Request.Context().Value("tokenClaims").(jwt.MapClaims)
 	userID := uint(tokenClaims["id"].(float64))
 
-	user, err := self.FindByID(userID)
+	user, err := instance.FindByID(userID)
 	if err != nil {
-		self.Error(
+		instance.Error(
 			"CREATE_tokens.FindByID",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -151,9 +151,9 @@ func (self REST) CREATE_tokens(
 		panic(exception.UnauthorizedException(fmt.Sprintf("user'status is %v", user.Status)))
 	}
 
-	permissions := self.GetUserPermissions(user.Groups)
+	permissions := instance.GetUserPermissions(user.Groups)
 
-	accessToken, err := self.SignToken(
+	accessToken, err := instance.SignToken(
 		jwt.MapClaims{
 			"id":          user.ID,
 			"store_id":    user.StoreID,
@@ -162,8 +162,8 @@ func (self REST) CREATE_tokens(
 			"email":       user.Email,
 			"permissions": permissions,
 		},
-		self.JWTAccessAPIKey,
-		self.JWTAccessAPIExpIn,
+		instance.JWTAccessAPIKey,
+		instance.JWTAccessAPIExpIn,
 	)
 
 	refreshTokenCookie, _ := ctx.Cookie("refresh_token")

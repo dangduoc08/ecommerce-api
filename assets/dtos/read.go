@@ -21,11 +21,11 @@ type READ_Query struct {
 	Offset int    `bind:"offset" validate:"gte=0"`
 }
 
-func (self READ_Query) Transform(query gooh.Query, medata common.ArgumentMetadata) any {
+func (instance READ_Query) Transform(query gooh.Query, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	bindedStruct, fls := query.Bind(self)
+	bindedStruct, fls := query.Bind(instance)
 
 	fieldMap := make(map[string]gooh.FieldLevel)
 	for _, fl := range fls {
@@ -60,7 +60,7 @@ func (self READ_Query) Transform(query gooh.Query, medata common.ArgumentMetadat
 		panic(exception.UnprocessableEntityException(errMsgs))
 	}
 
-	queryDTO.Dir = self.CleanDir(queryDTO.Dir)
+	queryDTO.Dir = instance.CleanDir(queryDTO.Dir)
 
 	return queryDTO
 }

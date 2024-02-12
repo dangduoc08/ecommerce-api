@@ -5,7 +5,7 @@ import (
 
 	"github.com/dangduoc08/ecommerce-api/addresses/models"
 	"github.com/dangduoc08/ecommerce-api/constants"
-	dbProviders "github.com/dangduoc08/ecommerce-api/db/providers"
+	dbProviders "github.com/dangduoc08/ecommerce-api/dbs/providers"
 	"github.com/dangduoc08/gooh/core"
 )
 
@@ -13,16 +13,16 @@ type DBHandler struct {
 	DBProvider dbProviders.DB
 }
 
-func (self DBHandler) NewProvider() core.Provider {
-	return self
+func (instance DBHandler) NewProvider() core.Provider {
+	return instance
 }
 
-func (self DBHandler) FindByID(id uint) (*models.Address, error) {
+func (instance DBHandler) FindByID(id uint) (*models.Address, error) {
 	addressRec := &models.Address{
 		ID: id,
 	}
 
-	if err := self.DBProvider.DB.
+	if err := instance.DBProvider.DB.
 		Joins("Location.Location.Location").
 		First(addressRec).
 		Error; err != nil {
@@ -32,7 +32,7 @@ func (self DBHandler) FindByID(id uint) (*models.Address, error) {
 	return addressRec, nil
 }
 
-func (self DBHandler) FindOneBy(query *Query) (*models.Address, error) {
+func (instance DBHandler) FindOneBy(query *Query) (*models.Address, error) {
 	addressRec := &models.Address{}
 	addressQueries := map[string]any{}
 
@@ -44,7 +44,7 @@ func (self DBHandler) FindOneBy(query *Query) (*models.Address, error) {
 		addressQueries["store_id"] = query.StoreID
 	}
 
-	if err := self.DBProvider.DB.
+	if err := instance.DBProvider.DB.
 		Where(addressQueries).
 		Joins("Location.Location.Location").
 		First(addressRec).
@@ -55,7 +55,7 @@ func (self DBHandler) FindOneBy(query *Query) (*models.Address, error) {
 	return addressRec, nil
 }
 
-func (self DBHandler) FindManyBy(query *Query) ([]*models.Address, error) {
+func (instance DBHandler) FindManyBy(query *Query) ([]*models.Address, error) {
 	addressRecs := []*models.Address{}
 	addressQueries := map[string]any{}
 
@@ -76,7 +76,7 @@ func (self DBHandler) FindManyBy(query *Query) ([]*models.Address, error) {
 		sort = fmt.Sprintf("%v %v", query.Sort, query.Order)
 	}
 
-	if err := self.DBProvider.DB.
+	if err := instance.DBProvider.DB.
 		Order(sort).
 		Limit(query.Limit).
 		Offset(query.Offset).
@@ -90,18 +90,18 @@ func (self DBHandler) FindManyBy(query *Query) ([]*models.Address, error) {
 	return addressRecs, nil
 }
 
-func (self DBHandler) CreateOne(data *Creation) (*models.Address, error) {
+func (instance DBHandler) CreateOne(data *Creation) (*models.Address, error) {
 	addressRec := &models.Address{
 		StoreID:    data.StoreID,
 		StreetName: data.StreetName,
 		LocationID: data.LocationID,
 	}
 
-	if err := self.DBProvider.DB.Create(&addressRec).Error; err != nil {
+	if err := instance.DBProvider.DB.Create(&addressRec).Error; err != nil {
 		return nil, err
 	}
 
-	if err := self.DBProvider.DB.
+	if err := instance.DBProvider.DB.
 		Joins("Location.Location.Location").
 		First(&addressRec).
 		Error; err != nil {
@@ -111,7 +111,7 @@ func (self DBHandler) CreateOne(data *Creation) (*models.Address, error) {
 	return addressRec, nil
 }
 
-func (self DBHandler) UpdateByID(id uint, data *Update) (*models.Address, error) {
+func (instance DBHandler) UpdateByID(id uint, data *Update) (*models.Address, error) {
 	addressRec := &models.Address{
 		ID:         id,
 		StoreID:    data.StoreID,
@@ -119,11 +119,11 @@ func (self DBHandler) UpdateByID(id uint, data *Update) (*models.Address, error)
 		LocationID: data.LocationID,
 	}
 
-	if err := self.DBProvider.DB.Updates(&addressRec).Error; err != nil {
+	if err := instance.DBProvider.DB.Updates(&addressRec).Error; err != nil {
 		return nil, err
 	}
 
-	if err := self.DBProvider.DB.
+	if err := instance.DBProvider.DB.
 		Joins("Location.Location.Location").
 		First(&addressRec).
 		Error; err != nil {
@@ -133,6 +133,6 @@ func (self DBHandler) UpdateByID(id uint, data *Update) (*models.Address, error)
 	return addressRec, nil
 }
 
-func (self DBHandler) DeleteByID(id uint) error {
-	return self.DBProvider.DB.Delete(&models.Address{}, id).Error
+func (instance DBHandler) DeleteByID(id uint) error {
+	return instance.DBProvider.DB.Delete(&models.Address{}, id).Error
 }

@@ -20,32 +20,32 @@ type REST struct {
 	providers.DBHandler
 }
 
-func (self REST) NewController() core.Controller {
-	self.
+func (instance REST) NewController() core.Controller {
+	instance.
 		Prefix("v1").
 		Prefix("addresses")
 
-	self.
+	instance.
 		BindGuard(shared.AuthGuard{})
 
-	self.
+	instance.
 		BindInterceptor(interceptors.AddressLocationTransformation{})
 
-	return self
+	return instance
 }
 
-func (self REST) READ_BY_id(
+func (instance REST) READ_BY_id(
 	ctx gooh.Context,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 	paramDTO dtos.READ_BY_id_Param,
 ) *models.Address {
-	address, err := self.FindOneBy(&providers.Query{
+	address, err := instance.FindOneBy(&providers.Query{
 		ID:      paramDTO.ID,
 		StoreID: tokenClaimsDTO.StoreID,
 	})
 
 	if err != nil {
-		self.Debug(
+		instance.Debug(
 			"READ_BY_id.FindOneBy",
 			"error", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -56,7 +56,7 @@ func (self REST) READ_BY_id(
 	return address
 }
 
-func (self REST) CREATE(
+func (instance REST) CREATE(
 	ctx gooh.Context,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 	dto dtos.CREATE_Body,
@@ -70,10 +70,10 @@ func (self REST) CREATE(
 		dataCreation.LocationID = nil
 	}
 
-	addresses, err := self.CreateOne(dataCreation)
+	addresses, err := instance.CreateOne(dataCreation)
 
 	if err != nil {
-		self.Debug(
+		instance.Debug(
 			"CREATE.CreateOne",
 			"error", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -84,13 +84,13 @@ func (self REST) CREATE(
 	return addresses
 }
 
-func (self REST) UPDATE_BY_id(
+func (instance REST) UPDATE_BY_id(
 	ctx gooh.Context,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 	paramDTO dtos.UPDATE_BY_id_Param,
 	bodyDTO dtos.UPDATE_BY_id_Body,
 ) *models.Address {
-	address, err := self.FindOneBy(&providers.Query{
+	address, err := instance.FindOneBy(&providers.Query{
 		ID:      paramDTO.ID,
 		StoreID: tokenClaimsDTO.StoreID,
 	})
@@ -108,9 +108,9 @@ func (self REST) UPDATE_BY_id(
 		dataUpdate.LocationID = nil
 	}
 
-	address, err = self.UpdateByID(paramDTO.ID, dataUpdate)
+	address, err = instance.UpdateByID(paramDTO.ID, dataUpdate)
 	if err != nil {
-		self.Debug(
+		instance.Debug(
 			"UPDATE_BY_id.CreateOne",
 			"error", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -121,18 +121,18 @@ func (self REST) UPDATE_BY_id(
 	return address
 }
 
-func (self REST) DELETE_BY_id(
+func (instance REST) DELETE_BY_id(
 	ctx gooh.Context,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 	paramDTO dtos.DELETE_BY_id_Param,
 ) gooh.Map {
-	_, err := self.FindOneBy(&providers.Query{
+	_, err := instance.FindOneBy(&providers.Query{
 		ID:      paramDTO.ID,
 		StoreID: tokenClaimsDTO.StoreID,
 	})
 
 	if err != nil {
-		self.Debug(
+		instance.Debug(
 			"DELETE_BY_id.FindOneBy",
 			"error", err.Error(),
 			"X-Request-ID", ctx.GetID(),
@@ -142,8 +142,8 @@ func (self REST) DELETE_BY_id(
 		}
 	}
 
-	if err = self.DeleteByID(paramDTO.ID); err != nil {
-		self.Debug(
+	if err = instance.DeleteByID(paramDTO.ID); err != nil {
+		instance.Debug(
 			"DELETE_BY_id.DeleteByID",
 			"error", err.Error(),
 			"X-Request-ID", ctx.GetID(),

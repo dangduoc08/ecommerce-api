@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/dangduoc08/ecommerce-api/categories/models"
-	dbProviders "github.com/dangduoc08/ecommerce-api/db/providers"
+	dbProviders "github.com/dangduoc08/ecommerce-api/dbs/providers"
 	"github.com/dangduoc08/ecommerce-api/utils"
 	"github.com/dangduoc08/gooh/core"
 )
@@ -14,14 +14,14 @@ type DBValidation struct {
 	dbProviders.DB
 }
 
-func (self DBValidation) NewProvider() core.Provider {
-	return self
+func (instance DBValidation) NewProvider() core.Provider {
+	return instance
 }
 
-func (self DBValidation) CheckParentCategories(parentCategoryIDs []uint) ([]*models.Category, error) {
+func (instance DBValidation) CheckParentCategories(parentCategoryIDs []uint) ([]*models.Category, error) {
 	categoryRecs := []*models.Category{}
 
-	if err := self.Where("id IN ?", parentCategoryIDs).Find(&categoryRecs).Error; err != nil {
+	if err := instance.Where("id IN ?", parentCategoryIDs).Find(&categoryRecs).Error; err != nil {
 		return nil, err
 	}
 
@@ -38,14 +38,14 @@ func (self DBValidation) CheckParentCategories(parentCategoryIDs []uint) ([]*mod
 	return categoryRecs, nil
 }
 
-func (self DBValidation) CheckCategoryRelationship(categoryID uint, parentCategoryIDs []uint) error {
+func (instance DBValidation) CheckCategoryRelationship(categoryID uint, parentCategoryIDs []uint) error {
 	for _, parentCategoryID := range parentCategoryIDs {
 		if categoryID == parentCategoryID {
 			return errors.New(fmt.Sprintf("Circular relationship are not allowed"))
 		}
 
 		categoryCategoryRecs := []*models.CategoryCategory{}
-		self.Raw("SELECT * FROM categories_categories WHERE category_id = ?", parentCategoryID).Scan(&categoryCategoryRecs)
+		instance.Raw("SELECT * FROM categories_categories WHERE category_id = ?", parentCategoryID).Scan(&categoryCategoryRecs)
 
 		for _, categoryCategoryRec := range categoryCategoryRecs {
 			if categoryID == categoryCategoryRec.ParentCategoryID {
@@ -53,7 +53,7 @@ func (self DBValidation) CheckCategoryRelationship(categoryID uint, parentCatego
 			}
 
 			if categoryCategoryRec.CategoryID != 0 && categoryCategoryRec.ParentCategoryID != 0 {
-				return self.CheckCategoryRelationship(categoryID, []uint{categoryCategoryRec.ParentCategoryID})
+				return instance.CheckCategoryRelationship(categoryID, []uint{categoryCategoryRec.ParentCategoryID})
 			}
 		}
 	}

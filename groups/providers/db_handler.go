@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/dangduoc08/ecommerce-api/constants"
-	dbProviders "github.com/dangduoc08/ecommerce-api/db/providers"
+	dbProviders "github.com/dangduoc08/ecommerce-api/dbs/providers"
 	"github.com/dangduoc08/ecommerce-api/groups/models"
 	"github.com/dangduoc08/gooh/common"
 	"github.com/dangduoc08/gooh/core"
@@ -18,11 +18,11 @@ type DBHandler struct {
 	common.Logger
 }
 
-func (self DBHandler) NewProvider() core.Provider {
-	return self
+func (instance DBHandler) NewProvider() core.Provider {
+	return instance
 }
 
-func (self DBHandler) FindOneBy(query *Query) (*models.Group, error) {
+func (instance DBHandler) FindOneBy(query *Query) (*models.Group, error) {
 	groupRec := &models.Group{}
 	groupQueries := map[string]any{}
 
@@ -34,7 +34,7 @@ func (self DBHandler) FindOneBy(query *Query) (*models.Group, error) {
 		groupQueries["store_id"] = query.StoreID
 	}
 
-	if err := self.
+	if err := instance.
 		Where(groupQueries).
 		First(groupRec).
 		Error; err != nil {
@@ -44,11 +44,11 @@ func (self DBHandler) FindOneBy(query *Query) (*models.Group, error) {
 	return groupRec, nil
 }
 
-func (self DBHandler) FindManyBy(query *Query) ([]*models.Group, error) {
+func (instance DBHandler) FindManyBy(query *Query) ([]*models.Group, error) {
 	groupRecs := []*models.Group{}
 	groupQueries := map[string]any{}
 
-	tx := self.DB.DB
+	tx := instance.DB.DB
 	if query != nil {
 		if len(query.IDs) > 0 {
 			tx = tx.Where("id IN ?", query.IDs)
@@ -81,21 +81,21 @@ func (self DBHandler) FindManyBy(query *Query) ([]*models.Group, error) {
 	return groupRecs, nil
 }
 
-func (self DBHandler) CreateOne(data *Creation) (*models.Group, error) {
+func (instance DBHandler) CreateOne(data *Creation) (*models.Group, error) {
 	group := &models.Group{
 		Name:        data.Name,
 		Permissions: data.Permissions,
 		StoreID:     data.StoreID,
 	}
 
-	if err := self.Create(group).Error; err != nil {
+	if err := instance.Create(group).Error; err != nil {
 		return nil, err
 	}
 
 	return group, nil
 }
 
-func (self DBHandler) UpdateByID(id uint, data *Update) (*models.Group, error) {
+func (instance DBHandler) UpdateByID(id uint, data *Update) (*models.Group, error) {
 	groupRec := &models.Group{
 		ID:          id,
 		StoreID:     data.StoreID,
@@ -103,7 +103,7 @@ func (self DBHandler) UpdateByID(id uint, data *Update) (*models.Group, error) {
 		Permissions: data.Permissions,
 	}
 
-	if err := self.
+	if err := instance.
 		Clauses(clause.Returning{}).
 		Updates(&groupRec).
 		Error; err != nil {
@@ -113,8 +113,8 @@ func (self DBHandler) UpdateByID(id uint, data *Update) (*models.Group, error) {
 	return groupRec, nil
 }
 
-func (self DBHandler) DeleteByID(id uint) error {
-	tx := self.Begin()
+func (instance DBHandler) DeleteByID(id uint) error {
+	tx := instance.Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()

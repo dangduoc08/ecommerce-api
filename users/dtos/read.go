@@ -19,11 +19,11 @@ type READ_Query struct {
 	Offset   int      `bind:"offset" validate:"gte=0"`
 }
 
-func (self READ_Query) Transform(query gooh.Query, medata common.ArgumentMetadata) any {
+func (instance READ_Query) Transform(query gooh.Query, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
-	bindedStruct, fls := query.Bind(self)
+	bindedStruct, fls := query.Bind(instance)
 	queryDTO := bindedStruct.(READ_Query)
 
 	fieldMap := make(map[string]gooh.FieldLevel)

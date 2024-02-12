@@ -17,11 +17,11 @@ type Query struct {
 type Creation struct {
 	Name        string
 	StoreID     uint
-	Permissions permissionModels.Permission
+	Permissions permissionModels.Permissions
 }
 
 type Update struct {
 	Name        string
 	StoreID     uint
-	Permissions permissionModels.Permission
+	Permissions permissionModels.Permissions
 }
