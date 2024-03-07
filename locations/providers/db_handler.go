@@ -7,8 +7,8 @@ import (
 
 	dbProviders "github.com/dangduoc08/ecommerce-api/dbs/providers"
 	"github.com/dangduoc08/ecommerce-api/locations/models"
-	"github.com/dangduoc08/gooh/core"
-	"github.com/dangduoc08/gooh/modules/config"
+	"github.com/dangduoc08/gogo/core"
+	"github.com/dangduoc08/gogo/modules/config"
 )
 
 type DBHandler struct {

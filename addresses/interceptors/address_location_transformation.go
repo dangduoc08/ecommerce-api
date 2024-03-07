@@ -5,9 +5,9 @@ import (
 
 	"github.com/dangduoc08/ecommerce-api/addresses/models"
 	locationModels "github.com/dangduoc08/ecommerce-api/locations/models"
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/ctx"
-	"github.com/dangduoc08/gooh/utils"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/ctx"
+	"github.com/dangduoc08/gogo/utils"
 )
 
 type AddressLocationTransformation struct{}
@@ -34,8 +34,8 @@ func (instance AddressLocationTransformation) transformLocationObjToArr(
 	return locationArr
 }
 
-func (instance AddressLocationTransformation) toResponseObj(address *models.Address) gooh.Map {
-	respData := gooh.Map{
+func (instance AddressLocationTransformation) toResponseObj(address *models.Address) gogo.Map {
+	respData := gogo.Map{
 		"id":          address.ID,
 		"street_name": address.StreetName,
 		"created_at":  address.CreatedAt,
@@ -52,9 +52,9 @@ func (instance AddressLocationTransformation) toResponseObj(address *models.Addr
 	return respData
 }
 
-func (instance AddressLocationTransformation) Intercept(c gooh.Context, aggregation gooh.Aggregation) any {
+func (instance AddressLocationTransformation) Intercept(c gogo.Context, aggregation gogo.Aggregation) any {
 	return aggregation.Pipe(
-		aggregation.Consume(func(c gooh.Context, data any) any {
+		aggregation.Consume(func(c gogo.Context, data any) any {
 			if !reflect.ValueOf(data).IsNil() {
 				switch address := data.(type) {
 
@@ -62,7 +62,7 @@ func (instance AddressLocationTransformation) Intercept(c gooh.Context, aggregat
 					return instance.toResponseObj(address)
 
 				case []*models.Address:
-					return utils.ArrMap[*models.Address, gooh.Map](address, func(address *models.Address, i int) ctx.Map {
+					return utils.ArrMap[*models.Address, gogo.Map](address, func(address *models.Address, i int) ctx.Map {
 						return instance.toResponseObj(address)
 					})
 				}

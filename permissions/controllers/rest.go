@@ -6,8 +6,8 @@ import (
 
 	"github.com/dangduoc08/ecommerce-api/shared"
 	"github.com/dangduoc08/ecommerce-api/utils"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/core"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/core"
 )
 
 type REST struct {

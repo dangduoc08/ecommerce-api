@@ -6,9 +6,9 @@ import (
 	"github.com/dangduoc08/ecommerce-api/constants"
 	dbProviders "github.com/dangduoc08/ecommerce-api/dbs/providers"
 	"github.com/dangduoc08/ecommerce-api/groups/models"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/core"
-	"github.com/dangduoc08/gooh/modules/config"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/core"
+	"github.com/dangduoc08/gogo/modules/config"
 	"gorm.io/gorm/clause"
 )
 

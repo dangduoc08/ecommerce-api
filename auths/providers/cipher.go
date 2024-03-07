@@ -7,9 +7,9 @@ import (
 	groupModels "github.com/dangduoc08/ecommerce-api/groups/models"
 	groupProviders "github.com/dangduoc08/ecommerce-api/groups/providers"
 	"github.com/dangduoc08/ecommerce-api/utils"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/core"
-	"github.com/dangduoc08/gooh/modules/config"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/core"
+	"github.com/dangduoc08/gogo/modules/config"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )

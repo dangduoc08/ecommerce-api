@@ -11,7 +11,7 @@ import (
 )
 
 type ProductImage struct {
-	URL   string `json:"url" bind:"url" validate:"http_url"`
+	URL   string `json:"url" bind:"url" validate:"dir"`
 	Order int    `json:"order" bind:"order" validate:"gte=0"`
 }
 

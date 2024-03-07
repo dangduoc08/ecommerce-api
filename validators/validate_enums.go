@@ -1,7 +1,7 @@
 package validators
 
 import (
-	"github.com/dangduoc08/gooh/utils"
+	"github.com/dangduoc08/gogo/utils"
 	"github.com/go-playground/validator/v10"
 )
 

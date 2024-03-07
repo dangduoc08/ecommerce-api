@@ -3,8 +3,8 @@ package dtos
 import (
 	"github.com/dangduoc08/ecommerce-api/assets/providers"
 	"github.com/dangduoc08/ecommerce-api/utils"
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/common"
 )
 
 type DELETE_Query struct {
@@ -12,7 +12,7 @@ type DELETE_Query struct {
 	Dirs []string `bind:"dirs"`
 }
 
-func (instance DELETE_Query) Transform(query gooh.Query, medata common.ArgumentMetadata) any {
+func (instance DELETE_Query) Transform(query gogo.Query, medata common.ArgumentMetadata) any {
 	bindedStruct, _ := query.Bind(instance)
 
 	queryDTO := bindedStruct.(DELETE_Query)

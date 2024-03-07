@@ -6,7 +6,7 @@ import (
 	"github.com/dangduoc08/ecommerce-api/addresses/models"
 	"github.com/dangduoc08/ecommerce-api/constants"
 	dbProviders "github.com/dangduoc08/ecommerce-api/dbs/providers"
-	"github.com/dangduoc08/gooh/core"
+	"github.com/dangduoc08/gogo/core"
 )
 
 type DBHandler struct {

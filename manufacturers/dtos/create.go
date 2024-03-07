@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/dangduoc08/ecommerce-api/validators"
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/exception"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/exception"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -21,7 +21,7 @@ type CREATE_Body struct {
 	Data CREATE_Body_Data `bind:"data"`
 }
 
-func (instance CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
+func (instance CREATE_Body) Transform(body gogo.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 	validate := validator.New()
 
@@ -32,7 +32,7 @@ func (instance CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMeta
 	bodyDTO.Data.Slug = strings.TrimSpace(bodyDTO.Data.Slug)
 	bodyDTO.Data.Logo = strings.TrimSpace(bodyDTO.Data.Logo)
 
-	fieldMap := make(map[string]gooh.FieldLevel)
+	fieldMap := make(map[string]gogo.FieldLevel)
 	for _, fl := range fls {
 		fieldMap[fl.Field()] = fl
 	}

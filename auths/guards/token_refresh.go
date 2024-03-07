@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/exception"
-	"github.com/dangduoc08/gooh/modules/config"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/exception"
+	"github.com/dangduoc08/gogo/modules/config"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -22,7 +22,7 @@ func (instance TokenRefresh) NewGuard() TokenRefresh {
 	return instance
 }
 
-func (instance TokenRefresh) CanActivate(c gooh.Context) bool {
+func (instance TokenRefresh) CanActivate(c gogo.Context) bool {
 	refreshTokenCookie, err := c.Cookie("refresh_token")
 	if err != nil {
 		return false

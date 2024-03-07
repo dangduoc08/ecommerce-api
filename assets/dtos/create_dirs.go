@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/dangduoc08/ecommerce-api/assets/providers"
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/exception"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/exception"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -20,7 +20,7 @@ type CREATE_dirs_Body struct {
 	Data CREATE_dirs_Body_Data `bind:"data"`
 }
 
-func (instance CREATE_dirs_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
+func (instance CREATE_dirs_Body) Transform(body gogo.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
@@ -28,7 +28,7 @@ func (instance CREATE_dirs_Body) Transform(body gooh.Body, medata common.Argumen
 	bodyDTO := dto.(CREATE_dirs_Body)
 	bodyDTO.Data.Dir = strings.TrimSpace(bodyDTO.Data.Dir)
 
-	fieldMap := make(map[string]gooh.FieldLevel)
+	fieldMap := make(map[string]gogo.FieldLevel)
 	for _, fl := range fls {
 		fieldMap[fl.Field()] = fl
 	}

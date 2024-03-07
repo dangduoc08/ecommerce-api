@@ -3,7 +3,7 @@ package categories
 import (
 	"github.com/dangduoc08/ecommerce-api/categories/controllers"
 	"github.com/dangduoc08/ecommerce-api/categories/providers"
-	"github.com/dangduoc08/gooh/core"
+	"github.com/dangduoc08/gogo/core"
 )
 
 var Module = core.ModuleBuilder().

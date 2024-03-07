@@ -8,10 +8,10 @@ import (
 	"github.com/dangduoc08/ecommerce-api/assets/models"
 	"github.com/dangduoc08/ecommerce-api/assets/providers"
 	"github.com/dangduoc08/ecommerce-api/shared"
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/core"
-	"github.com/dangduoc08/gooh/exception"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/core"
+	"github.com/dangduoc08/gogo/exception"
 )
 
 type REST struct {
@@ -46,7 +46,7 @@ func (instance REST) NewController() core.Controller {
 }
 
 func (instance REST) READ(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	queryDTO dtos.READ_Query,
 ) []*models.Asset {
 	ls, err := instance.List(instance.PublicPath + queryDTO.Dir)
@@ -65,9 +65,9 @@ func (instance REST) READ(
 }
 
 func (instance REST) CREATE_dirs(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	bodyDTO dtos.CREATE_dirs_Body,
-) gooh.Map {
+) gogo.Map {
 	dir, err := instance.Mkdir(instance.PublicPath, bodyDTO.Data.Dir)
 
 	if err != nil {
@@ -79,16 +79,16 @@ func (instance REST) CREATE_dirs(
 		panic(exception.InternalServerErrorException(err.Error()))
 	}
 
-	return gooh.Map{
+	return gogo.Map{
 		"dir": dir,
 	}
 }
 
 func (instance REST) CREATE_files(
 	fileBodyDTO dtos.CREATE_files_Body,
-) gooh.Map {
+) gogo.Map {
 	if fileBodyDTO.File.Dest == "" {
-		return gooh.Map{
+		return gogo.Map{
 			"uploaded": false,
 			"dir":      "",
 		}
@@ -99,16 +99,16 @@ func (instance REST) CREATE_files(
 		dir = dir[1:]
 	}
 
-	return gooh.Map{
+	return gogo.Map{
 		"uploaded": true,
 		"dir":      dir,
 	}
 }
 
 func (instance REST) MODIFY_dirs(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	bodyDTO dtos.MODIFY_Body,
-) gooh.Map {
+) gogo.Map {
 	if err := os.Rename(instance.PublicPath+bodyDTO.Data.OldDir, instance.PublicPath+bodyDTO.Data.NewDir); err != nil {
 		panic(exception.InternalServerErrorException(err.Error()))
 	}
@@ -117,15 +117,15 @@ func (instance REST) MODIFY_dirs(
 	if dir != "" {
 		dir = dir[1:]
 	}
-	return gooh.Map{
+	return gogo.Map{
 		"dir": dir,
 	}
 }
 
 func (instance REST) DELETE(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	queryDTO dtos.DELETE_Query,
-) gooh.Map {
+) gogo.Map {
 	for _, dir := range queryDTO.Dirs {
 		if dir != "/" {
 			if err := os.RemoveAll(instance.PublicPath + dir); err != nil {
@@ -134,7 +134,7 @@ func (instance REST) DELETE(
 		}
 	}
 
-	return gooh.Map{
+	return gogo.Map{
 		"deleted": true,
 	}
 }

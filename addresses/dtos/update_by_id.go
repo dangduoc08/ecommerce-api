@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/exception"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/exception"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -14,13 +14,13 @@ type UPDATE_BY_id_Param struct {
 	ID uint `bind:"id"`
 }
 
-func (instance UPDATE_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
+func (instance UPDATE_BY_id_Param) Transform(param gogo.Param, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
 	paramDTO, fls := param.Bind(instance)
 
-	fieldMap := make(map[string]gooh.FieldLevel)
+	fieldMap := make(map[string]gogo.FieldLevel)
 	for _, fl := range fls {
 		fieldMap[fl.Field()] = fl
 	}
@@ -53,7 +53,7 @@ type UPDATE_BY_id_Body struct {
 	Data UPDATE_BY_id_Body_Data `bind:"data"`
 }
 
-func (instance UPDATE_BY_id_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
+func (instance UPDATE_BY_id_Body) Transform(body gogo.Body, medata common.ArgumentMetadata) any {
 	bindedBody, _ := body.Bind(instance)
 
 	bodyDTO := bindedBody.(CREATE_Body)

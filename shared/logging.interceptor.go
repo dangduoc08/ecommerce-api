@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/exception"
-	"github.com/dangduoc08/gooh/modules/config"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/exception"
+	"github.com/dangduoc08/gogo/modules/config"
 )
 
 type LoggingInterceptor struct {
@@ -15,7 +15,7 @@ type LoggingInterceptor struct {
 	Logger        common.Logger
 }
 
-func (instance LoggingInterceptor) Intercept(c gooh.Context, aggregation gooh.Aggregation) any {
+func (instance LoggingInterceptor) Intercept(c gogo.Context, aggregation gogo.Aggregation) any {
 	datas := []any{}
 
 	if c.Method == http.MethodPost || c.Method == http.MethodPut || c.Method == http.MethodPatch {
@@ -61,7 +61,7 @@ func (instance LoggingInterceptor) Intercept(c gooh.Context, aggregation gooh.Ag
 	)
 
 	return aggregation.Pipe(
-		aggregation.Consume(func(c gooh.Context, data any) any {
+		aggregation.Consume(func(c gogo.Context, data any) any {
 			resJSON, _ := json.Marshal(data)
 			resJSONStr := string(resJSON)
 			if resJSONStr != "{}" {
@@ -79,7 +79,7 @@ func (instance LoggingInterceptor) Intercept(c gooh.Context, aggregation gooh.Ag
 			}
 			return data
 		}),
-		aggregation.Error(func(c gooh.Context, err any) any {
+		aggregation.Error(func(c gogo.Context, err any) any {
 			if httpException, ok := err.(exception.HTTPException); ok {
 				instance.Logger.Debug(
 					"ErrorResponse",

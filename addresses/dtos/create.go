@@ -3,8 +3,8 @@ package dtos
 import (
 	"strings"
 
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/common"
 )
 
 type CREATE_Body_Data struct {
@@ -16,7 +16,7 @@ type CREATE_Body struct {
 	Data CREATE_Body_Data `bind:"data"`
 }
 
-func (instance CREATE_Body) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
+func (instance CREATE_Body) Transform(body gogo.Body, medata common.ArgumentMetadata) any {
 	bindedBody, _ := body.Bind(instance)
 	bodyDTO := bindedBody.(CREATE_Body)
 

@@ -6,10 +6,10 @@ import (
 	"github.com/dangduoc08/ecommerce-api/addresses/models"
 	"github.com/dangduoc08/ecommerce-api/addresses/providers"
 	"github.com/dangduoc08/ecommerce-api/shared"
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/core"
-	"github.com/dangduoc08/gooh/exception"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/core"
+	"github.com/dangduoc08/gogo/exception"
 )
 
 type REST struct {
@@ -35,7 +35,7 @@ func (instance REST) NewController() core.Controller {
 }
 
 func (instance REST) READ_BY_id(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 	paramDTO dtos.READ_BY_id_Param,
 ) *models.Address {
@@ -57,7 +57,7 @@ func (instance REST) READ_BY_id(
 }
 
 func (instance REST) CREATE(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 	dto dtos.CREATE_Body,
 ) *models.Address {
@@ -85,7 +85,7 @@ func (instance REST) CREATE(
 }
 
 func (instance REST) UPDATE_BY_id(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 	paramDTO dtos.UPDATE_BY_id_Param,
 	bodyDTO dtos.UPDATE_BY_id_Body,
@@ -122,10 +122,10 @@ func (instance REST) UPDATE_BY_id(
 }
 
 func (instance REST) DELETE_BY_id(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 	paramDTO dtos.DELETE_BY_id_Param,
-) gooh.Map {
+) gogo.Map {
 	_, err := instance.FindOneBy(&providers.Query{
 		ID:      paramDTO.ID,
 		StoreID: tokenClaimsDTO.StoreID,
@@ -137,7 +137,7 @@ func (instance REST) DELETE_BY_id(
 			"error", err.Error(),
 			"X-Request-ID", ctx.GetID(),
 		)
-		return gooh.Map{
+		return gogo.Map{
 			"deleted": false,
 		}
 	}
@@ -148,12 +148,12 @@ func (instance REST) DELETE_BY_id(
 			"error", err.Error(),
 			"X-Request-ID", ctx.GetID(),
 		)
-		return gooh.Map{
+		return gogo.Map{
 			"deleted": false,
 		}
 	}
 
-	return gooh.Map{
+	return gogo.Map{
 		"deleted": true,
 	}
 }

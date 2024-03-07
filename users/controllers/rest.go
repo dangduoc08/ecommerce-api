@@ -5,11 +5,11 @@ import (
 	"github.com/dangduoc08/ecommerce-api/users/dtos"
 	"github.com/dangduoc08/ecommerce-api/users/models"
 	"github.com/dangduoc08/ecommerce-api/users/providers"
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/core"
-	"github.com/dangduoc08/gooh/exception"
-	"github.com/dangduoc08/gooh/modules/config"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/core"
+	"github.com/dangduoc08/gogo/exception"
+	"github.com/dangduoc08/gogo/modules/config"
 )
 
 type REST struct {
@@ -35,7 +35,7 @@ func (instance REST) NewController() core.Controller {
 func (instance REST) READ(
 	tokenClaimsDTO shared.TokenClaimsDTO,
 	queryDTO dtos.READ_Query,
-	ctx gooh.Context,
+	ctx gogo.Context,
 ) []*models.User {
 	users, err := instance.FindManyBy(&providers.Query{
 		StoreID:  tokenClaimsDTO.StoreID,
@@ -61,7 +61,7 @@ func (instance REST) READ(
 func (instance REST) CREATE(
 	bodyDTO dtos.CREATE_Body,
 	tokenClaimsDTO shared.TokenClaimsDTO,
-	ctx gooh.Context,
+	ctx gogo.Context,
 ) *models.User {
 	dataCheckDuplication := []map[string]string{
 		{
@@ -102,7 +102,7 @@ func (instance REST) MODIFY_statuses_OF_BY_id(
 	tokenClaimsDTO shared.TokenClaimsDTO,
 	paramDTO dtos.MODIFY_statuses_OF_BY_id_Param,
 	bodyDTO dtos.MODIFY_statuses_OF_BY_id,
-	ctx gooh.Context,
+	ctx gogo.Context,
 ) *models.User {
 	user, err := instance.FindByID(paramDTO.ID)
 	if err != nil {

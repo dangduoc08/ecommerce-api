@@ -5,9 +5,9 @@ import (
 
 	"github.com/dangduoc08/ecommerce-api/constants"
 	"github.com/dangduoc08/ecommerce-api/validators"
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/exception"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/exception"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -15,13 +15,13 @@ type MODIFY_statuses_OF_BY_id_Param struct {
 	ID uint `bind:"id" validate:"required"`
 }
 
-func (instance MODIFY_statuses_OF_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
+func (instance MODIFY_statuses_OF_BY_id_Param) Transform(param gogo.Param, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
 	paramDTO, fls := param.Bind(instance)
 
-	fieldMap := make(map[string]gooh.FieldLevel)
+	fieldMap := make(map[string]gogo.FieldLevel)
 	for _, fl := range fls {
 		fieldMap[fl.Field()] = fl
 	}
@@ -53,14 +53,14 @@ type MODIFY_statuses_OF_BY_id struct {
 	Data MODIFY_statuses_OF_BY_id_Data `bind:"data"`
 }
 
-func (instance MODIFY_statuses_OF_BY_id) Transform(body gooh.Body, medata common.ArgumentMetadata) any {
+func (instance MODIFY_statuses_OF_BY_id) Transform(body gogo.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
 	bindedStruct, fls := body.Bind(instance)
 	bodyDTO := bindedStruct.(MODIFY_statuses_OF_BY_id)
 
-	fieldMap := make(map[string]gooh.FieldLevel)
+	fieldMap := make(map[string]gogo.FieldLevel)
 	for _, fl := range fls {
 		fieldMap[fl.Field()] = fl
 	}

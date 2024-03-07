@@ -9,8 +9,8 @@ import (
 	"github.com/dangduoc08/ecommerce-api/constants"
 	"github.com/dangduoc08/ecommerce-api/utils"
 	"github.com/dangduoc08/ecommerce-api/validators"
-	"github.com/dangduoc08/gooh/ctx"
-	"github.com/dangduoc08/gooh/modules/config"
+	"github.com/dangduoc08/gogo/ctx"
+	"github.com/dangduoc08/gogo/modules/config"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -43,7 +43,7 @@ var Module = config.Register(&config.ConfigModuleOptions{
 			err := v.Struct(configDTO)
 			if err != nil {
 				for _, err := range err.(validator.ValidationErrors) {
-					fieldLevel := utils.ArrFind[ctx.FieldLevel](fieldLevels, func(el ctx.FieldLevel, i int) bool {
+					fieldLevel := utils.ArrFind(fieldLevels, func(el ctx.FieldLevel, i int) bool {
 						return el.Field() == err.Field()
 					})
 

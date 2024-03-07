@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dangduoc08/gooh/core"
-	"github.com/dangduoc08/gooh/utils"
+	"github.com/dangduoc08/gogo/core"
+	"github.com/dangduoc08/gogo/utils"
 	"gorm.io/gorm"
 )
 

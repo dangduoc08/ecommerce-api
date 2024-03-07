@@ -1,9 +1,9 @@
 package shared
 
 import (
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/ctx"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/ctx"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -17,7 +17,7 @@ type TokenClaimsDTO struct {
 	Permissions []string `bind:"permissions"`
 }
 
-func (instance TokenClaimsDTO) Transform(c gooh.Context, medata common.ArgumentMetadata) any {
+func (instance TokenClaimsDTO) Transform(c gogo.Context, medata common.ArgumentMetadata) any {
 	tokenClaims := c.Context().Value("tokenClaims").(jwt.MapClaims)
 	tokenClaimsDTO, _ := ctx.BindStruct(tokenClaims, &[]ctx.FieldLevel{}, TokenClaimsDTO{}, "")
 

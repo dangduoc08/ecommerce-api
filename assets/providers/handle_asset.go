@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/dangduoc08/ecommerce-api/assets/models"
-	"github.com/dangduoc08/gooh/core"
+	"github.com/dangduoc08/gogo/core"
 )
 
 type HandleAsset struct {

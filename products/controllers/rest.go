@@ -7,10 +7,10 @@ import (
 	"github.com/dangduoc08/ecommerce-api/products/models"
 	"github.com/dangduoc08/ecommerce-api/products/providers"
 	"github.com/dangduoc08/ecommerce-api/shared"
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/core"
-	"github.com/dangduoc08/gooh/exception"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/core"
+	"github.com/dangduoc08/gogo/exception"
 )
 
 type REST struct {
@@ -34,7 +34,7 @@ func (instance REST) NewController() core.Controller {
 }
 
 func (instance REST) READ(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 	queryDTO dtos.READ_Query,
 ) []*models.Product {
@@ -61,7 +61,7 @@ func (instance REST) READ(
 }
 
 func (instance REST) READ_BY_id(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	paramDTO dtos.READ_BY_id_Param,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 ) *models.Product {
@@ -80,7 +80,7 @@ func (instance REST) READ_BY_id(
 }
 
 func (instance REST) CREATE(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	bodyDTO dtos.CREATE_Body,
 	tokenClaimsDTO shared.TokenClaimsDTO,
 ) *models.Product {
@@ -138,10 +138,10 @@ func (instance REST) CREATE(
 }
 
 func (instance REST) UPDATE_BY_id(
-// ctx gooh.Context,
-// paramDTO dtos.UPDATE_BY_id_Param,
-// bodyDTO dtos.UPDATE_BY_id_Body,
-// tokenClaimsDTO shared.TokenClaimsDTO,
+	ctx gogo.Context,
+	paramDTO dtos.UPDATE_BY_id_Param,
+	bodyDTO dtos.UPDATE_BY_id_Body,
+	tokenClaimsDTO shared.TokenClaimsDTO,
 ) any {
 	// _, err := instance.FindOneBy(&providers.Query{
 	// 	ID:      paramDTO.ID,

@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/dangduoc08/ecommerce-api/utils"
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/exception"
-	"github.com/dangduoc08/gooh/modules/config"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/exception"
+	"github.com/dangduoc08/gogo/modules/config"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -37,7 +37,7 @@ func (instance AuthGuard) checkPermission(accessTo string, permissions []any) bo
 	return false
 }
 
-func (instance AuthGuard) CanActivate(c gooh.Context) bool {
+func (instance AuthGuard) CanActivate(c gogo.Context) bool {
 	accessTokenCookie, err := c.Cookie("access_token")
 	if err != nil {
 		return false

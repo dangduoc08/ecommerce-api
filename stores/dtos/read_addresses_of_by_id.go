@@ -5,9 +5,9 @@ import (
 
 	"github.com/dangduoc08/ecommerce-api/constants"
 	"github.com/dangduoc08/ecommerce-api/validators"
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/exception"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/exception"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -15,13 +15,13 @@ type READ_addresses_OF_BY_id_Param struct {
 	ID uint `bind:"id" validate:"required"`
 }
 
-func (instance READ_addresses_OF_BY_id_Param) Transform(param gooh.Param, medata common.ArgumentMetadata) any {
+func (instance READ_addresses_OF_BY_id_Param) Transform(param gogo.Param, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
 	paramDTO, fls := param.Bind(instance)
 
-	fieldMap := make(map[string]gooh.FieldLevel)
+	fieldMap := make(map[string]gogo.FieldLevel)
 	for _, fl := range fls {
 		fieldMap[fl.Field()] = fl
 	}
@@ -52,14 +52,14 @@ type READ_addresses_OF_BY_id_Query struct {
 	Offset int    `bind:"offset" validate:"gte=0"`
 }
 
-func (instance READ_addresses_OF_BY_id_Query) Transform(query gooh.Query, medata common.ArgumentMetadata) any {
+func (instance READ_addresses_OF_BY_id_Query) Transform(query gogo.Query, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
 	bindedStruct, fls := query.Bind(instance)
 	queryDTO := bindedStruct.(READ_addresses_OF_BY_id_Query)
 
-	fieldMap := make(map[string]gooh.FieldLevel)
+	fieldMap := make(map[string]gogo.FieldLevel)
 	for _, fl := range fls {
 		fieldMap[fl.Field()] = fl
 	}

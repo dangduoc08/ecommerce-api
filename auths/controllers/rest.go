@@ -10,11 +10,11 @@ import (
 	"github.com/dangduoc08/ecommerce-api/constants"
 	userModels "github.com/dangduoc08/ecommerce-api/users/models"
 	userProviders "github.com/dangduoc08/ecommerce-api/users/providers"
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/core"
-	"github.com/dangduoc08/gooh/exception"
-	"github.com/dangduoc08/gooh/modules/config"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/core"
+	"github.com/dangduoc08/gogo/exception"
+	"github.com/dangduoc08/gogo/modules/config"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -52,9 +52,9 @@ func (instance REST) NewController() core.Controller {
 }
 
 func (instance REST) CREATE_sessions(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	bodyDTO dtos.CREATE_sessions_Body,
-) gooh.Map {
+) gogo.Map {
 	user, err := instance.FindOneBy(&userProviders.Query{
 		Username: bodyDTO.Data.Username,
 	})
@@ -117,10 +117,10 @@ func (instance REST) CREATE_sessions(
 		panic(exception.InternalServerErrorException(err.Error()))
 	}
 
-	return gooh.Map{
+	return gogo.Map{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
-		"user": gooh.Map{
+		"user": gogo.Map{
 			"id":          user.ID,
 			"store_id":    user.StoreID,
 			"first_name":  user.FirstName,
@@ -132,8 +132,8 @@ func (instance REST) CREATE_sessions(
 }
 
 func (instance REST) CREATE_tokens(
-	ctx gooh.Context,
-) gooh.Map {
+	ctx gogo.Context,
+) gogo.Map {
 	tokenClaims := ctx.Request.Context().Value("tokenClaims").(jwt.MapClaims)
 	userID := uint(tokenClaims["id"].(float64))
 
@@ -169,10 +169,10 @@ func (instance REST) CREATE_tokens(
 	refreshTokenCookie, _ := ctx.Cookie("refresh_token")
 	refreshToken := strings.Replace(refreshTokenCookie.Value, "Bearer ", "", 1)
 
-	return gooh.Map{
+	return gogo.Map{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
-		"user": gooh.Map{
+		"user": gogo.Map{
 			"id":          user.ID,
 			"store_id":    user.StoreID,
 			"first_name":  user.FirstName,

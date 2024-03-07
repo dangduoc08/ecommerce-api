@@ -5,15 +5,15 @@ import (
 	"reflect"
 
 	"github.com/dangduoc08/ecommerce-api/utils"
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/exception"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/exception"
 )
 
 type SubCategoryTransformation struct{}
 
-func (instance SubCategoryTransformation) Intercept(c gooh.Context, aggregation gooh.Aggregation) any {
+func (instance SubCategoryTransformation) Intercept(c gogo.Context, aggregation gogo.Aggregation) any {
 	return aggregation.Pipe(
-		aggregation.Consume(func(c gooh.Context, data any) any {
+		aggregation.Consume(func(c gogo.Context, data any) any {
 			if !reflect.ValueOf(data).IsNil() {
 				if menu, ok := data.(*[]map[string]any); ok {
 					for _, item := range *menu {

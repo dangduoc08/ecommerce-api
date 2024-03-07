@@ -6,7 +6,7 @@ import (
 	"github.com/dangduoc08/ecommerce-api/seeds/providers"
 	"github.com/dangduoc08/ecommerce-api/stores"
 	"github.com/dangduoc08/ecommerce-api/users"
-	"github.com/dangduoc08/gooh/core"
+	"github.com/dangduoc08/gogo/core"
 )
 
 var Module = core.ModuleBuilder().

@@ -10,10 +10,10 @@ import (
 	"github.com/dangduoc08/ecommerce-api/stores/dtos"
 	"github.com/dangduoc08/ecommerce-api/stores/models"
 	"github.com/dangduoc08/ecommerce-api/stores/providers"
-	"github.com/dangduoc08/gooh"
-	"github.com/dangduoc08/gooh/common"
-	"github.com/dangduoc08/gooh/core"
-	"github.com/dangduoc08/gooh/exception"
+	"github.com/dangduoc08/gogo"
+	"github.com/dangduoc08/gogo/common"
+	"github.com/dangduoc08/gogo/core"
+	"github.com/dangduoc08/gogo/exception"
 )
 
 type REST struct {
@@ -51,7 +51,7 @@ func (instance REST) NewController() core.Controller {
 }
 
 func (instance REST) READ_BY_id(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	paramDTO dtos.READ_BY_id_Param,
 ) *models.Store {
 	store, err := instance.FindByID(paramDTO.ID)
@@ -68,7 +68,7 @@ func (instance REST) READ_BY_id(
 }
 
 func (instance REST) READ_categories_OF_BY_id(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	paramDTO dtos.READ_categories_OF_BY_id_Param,
 	queryDTO dtos.READ_categories_OF_BY_id_Query,
 ) *[]map[string]any {
@@ -90,7 +90,7 @@ func (instance REST) READ_categories_OF_BY_id(
 }
 
 func (instance REST) READ_addresses_OF_BY_id(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	paramDTO dtos.READ_addresses_OF_BY_id_Param,
 	queryDTO dtos.READ_addresses_OF_BY_id_Query,
 ) []*addressModels.Address {
@@ -115,11 +115,11 @@ func (instance REST) READ_addresses_OF_BY_id(
 }
 
 func (instance REST) UPDATE_BY_id(
-	ctx gooh.Context,
+	ctx gogo.Context,
 	paramDTO dtos.UPDATE_BY_id_Param,
 	bodyDTO dtos.UPDATE_BY_id_Body,
 ) *models.Store {
-	store, err := instance.FindByID(paramDTO.ID)
+	_, err := instance.FindByID(paramDTO.ID)
 	if err != nil {
 		instance.Debug(
 			"UPDATE_BY_id.FindByID",
@@ -129,7 +129,7 @@ func (instance REST) UPDATE_BY_id(
 		panic(exception.NotFoundException(err.Error()))
 	}
 
-	store, err = instance.UpdateByID(paramDTO.ID, &providers.Update{
+	store, err := instance.UpdateByID(paramDTO.ID, &providers.Update{
 		Name:        bodyDTO.Data.Name,
 		Description: &bodyDTO.Data.Description,
 		Phone:       &bodyDTO.Data.Phone,

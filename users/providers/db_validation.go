@@ -5,7 +5,7 @@ import (
 
 	dbProviders "github.com/dangduoc08/ecommerce-api/dbs/providers"
 	"github.com/dangduoc08/ecommerce-api/users/models"
-	"github.com/dangduoc08/gooh/core"
+	"github.com/dangduoc08/gogo/core"
 )
 
 type DBValidation struct {
