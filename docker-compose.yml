@@ -19,7 +19,7 @@ services:
           nocopy: true
 
 networks:
-  reminders_net:
+  ecommerce_net:
   
 volumes:
   data:

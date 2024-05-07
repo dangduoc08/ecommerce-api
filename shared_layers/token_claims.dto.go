@@ -21,7 +21,7 @@ type TokenClaimsDTO struct {
 
 func (instance TokenClaimsDTO) Transform(c gogo.Context, medata common.ArgumentMetadata) any {
 	tokenClaims := c.Context().Value(TokenClaimContextKey("tokenClaims")).(jwt.MapClaims)
-	tokenClaimsDTO, _ := ctx.BindStruct(tokenClaims, &[]ctx.FieldLevel{}, TokenClaimsDTO{}, "")
+	tokenClaimsDTO, _ := ctx.BindStruct(tokenClaims, &[]ctx.FieldLevel{}, TokenClaimsDTO{}, "", "")
 
 	return tokenClaimsDTO
 }

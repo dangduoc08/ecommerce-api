@@ -1,0 +1,15 @@
+[
+  {
+    "user_name": "admin123",
+    "password": "Qwerty1234#!",
+    "email": "admin123@gmail.com",
+    "first_name": "John",
+    "last_name": "Doe",
+    "groups": {
+      "name": "Administrator",
+      "permissions": [
+        "*"
+      ]
+    }
+  }
+]

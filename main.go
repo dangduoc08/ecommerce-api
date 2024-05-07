@@ -4,6 +4,7 @@ import (
 	"github.com/dangduoc08/ecommerce-api/admins"
 	"github.com/dangduoc08/ecommerce-api/confs"
 	"github.com/dangduoc08/ecommerce-api/dbs"
+	"github.com/dangduoc08/ecommerce-api/mails"
 	"github.com/dangduoc08/ecommerce-api/seeds"
 	sharedLayers "github.com/dangduoc08/ecommerce-api/shared_layers"
 	"github.com/dangduoc08/ecommerce-api/statics"
@@ -50,6 +51,7 @@ func main() {
 				admins.AdminModule,
 				storefronts.StorefrontModule,
 				statics.StaticModule,
+				mails.MailModule,
 			).
 			Build(),
 	)

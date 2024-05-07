@@ -1,7 +1,9 @@
 package users
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/dangduoc08/ecommerce-api/constants"
 	"github.com/dangduoc08/ecommerce-api/dbs"
@@ -15,6 +17,35 @@ type UserProvider struct {
 
 func (instance UserProvider) NewProvider() core.Provider {
 	return instance
+}
+
+func (instance UserProvider) Seed(cb func(UserModel)) {
+	dir, _ := os.Getwd()
+	data, err := os.ReadFile(fmt.Sprintf("%v/seeds/datas/%v", dir, "users.json"))
+	if err != nil {
+		panic(err)
+	}
+
+	var userList []map[string]any
+	err = json.Unmarshal(data, &userList)
+	if err != nil {
+		panic(err)
+	}
+
+	if len(userList) > 0 {
+		for _, user := range userList {
+			userRec := UserModel{
+				Username:  user["user_name"].(string),
+				Hash:      user["user_name"].(string),
+				Email:     user["email"].(string),
+				FirstName: user["first_name"].(string),
+				LastName:  user["last_name"].(string),
+				Status:    UserStatus(constants.USER_ACTIVE),
+			}
+
+			cb(userRec)
+		}
+	}
 }
 
 func (instance UserProvider) FindByID(id uint) (*UserModel, error) {
@@ -31,20 +62,24 @@ func (instance UserProvider) FindByID(id uint) (*UserModel, error) {
 	return userRec, nil
 }
 
-func (instance UserProvider) FindOneBy(query *Query) (*UserModel, error) {
+func (instance UserProvider) FindOneBy(queries ...*Query) (*UserModel, error) {
 	userRec := &UserModel{}
-	userQueries := map[string]any{}
+	tx := instance.DB
 
-	if query.Username != "" {
-		userQueries["username"] = query.Username
+	for _, query := range queries {
+		userQueries := map[string]any{}
+		if query.Username != "" {
+			userQueries["username"] = query.Username
+		}
+
+		if query.Email != "" {
+			userQueries["email"] = query.Email
+		}
+
+		tx = tx.Or(userQueries)
 	}
 
-	if query.Email != "" {
-		userQueries["email"] = query.Username
-	}
-
-	if err := instance.DB.
-		Where(userQueries).
+	if err := tx.
 		Preload("Groups").
 		First(userRec).
 		Error; err != nil {

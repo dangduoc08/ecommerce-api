@@ -6,6 +6,7 @@ import (
 	"github.com/dangduoc08/ecommerce-api/admins/auths"
 	"github.com/dangduoc08/ecommerce-api/admins/categories"
 	"github.com/dangduoc08/ecommerce-api/admins/groups"
+	mailConfigurations "github.com/dangduoc08/ecommerce-api/admins/mail_configurations"
 	"github.com/dangduoc08/ecommerce-api/admins/manufacturers"
 	"github.com/dangduoc08/ecommerce-api/admins/permissions"
 	"github.com/dangduoc08/ecommerce-api/admins/products"
@@ -28,6 +29,7 @@ var AdminModule = func() *core.Module {
 			categories.CategoryModule,
 			products.ProductModule,
 			assets.AssetModule,
+			mailConfigurations.MailConfigurationModule,
 		).
 		Build()
 

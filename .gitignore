@@ -31,5 +31,5 @@ go.work
 *.dtmp
 
 # envs
-.env*
+.env
 publics

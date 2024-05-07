@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dangduoc08/ecommerce-api/validators"
 	"github.com/dangduoc08/gogo"
 	"github.com/dangduoc08/gogo/common"
 	"github.com/dangduoc08/gogo/exception"
@@ -32,8 +31,8 @@ func (instance UPDATE_BY_id_Param_DTO) Transform(param gogo.Param, medata common
 		for _, fieldErr := range fieldErrs.(validator.ValidationErrors) {
 			fl := fieldMap[fieldErr.Field()]
 			errMsgs = append(errMsgs, map[string]any{
-				"field": fl.Tag(),
-				"error": fmt.Sprintf("must be %v", fieldErr.Tag()),
+				"field": fl.NestedTag(),
+				"error": strings.TrimSpace(fmt.Sprintf("must be %v %v", fieldErr.Tag(), fieldErr.Param())),
 			})
 		}
 	}
@@ -46,10 +45,10 @@ func (instance UPDATE_BY_id_Param_DTO) Transform(param gogo.Param, medata common
 }
 
 type UPDATE_BY_id_Body_Data_DTO struct {
-	Name        string `bind:"name" validate:"required,lte=130"`
-	Description string `bind:"description"`
-	Phone       string `bind:"phone" validate:"phone"`
-	Email       string `bind:"email" validate:"omitempty,email"`
+	Host     string `bind:"host" validate:"omitempty,fqdn"`
+	Port     int    `bind:"port"`
+	Username string `bind:"username"`
+	Password string `bind:"password"`
 }
 
 type UPDATE_BY_id_Body_DTO struct {
@@ -63,25 +62,13 @@ func (instance UPDATE_BY_id_Body_DTO) Transform(body gogo.Body, medata common.Ar
 	dto, fls := body.Bind(instance)
 	bodyDTO := dto.(UPDATE_BY_id_Body_DTO)
 
-	bodyDTO.Data.Name = strings.TrimSpace(bodyDTO.Data.Name)
-	bodyDTO.Data.Description = strings.TrimSpace(bodyDTO.Data.Description)
-	bodyDTO.Data.Phone = strings.TrimSpace(bodyDTO.Data.Phone)
-	bodyDTO.Data.Email = strings.TrimSpace(bodyDTO.Data.Email)
+	bodyDTO.Data.Host = strings.TrimSpace(bodyDTO.Data.Host)
+	bodyDTO.Data.Username = strings.TrimSpace(bodyDTO.Data.Username)
 
 	fieldMap := make(map[string]gogo.FieldLevel)
 	for _, fl := range fls {
 		fieldMap[fl.Field()] = fl
 	}
-
-	validate.RegisterValidation("phone", validators.ValidatePhone("VN", func(fieldErr validator.FieldError) {
-		if fieldErr != nil {
-			fl := fieldMap[fieldErr.Field()]
-			errMsgs = append(errMsgs, map[string]any{
-				"field": fl.NestedTag(),
-				"error": strings.TrimSpace(fmt.Sprintf("%v is invalid phone format", fieldErr.Value())),
-			})
-		}
-	}))
 
 	fieldErrs := validate.Struct(bodyDTO)
 

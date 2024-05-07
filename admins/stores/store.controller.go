@@ -21,7 +21,6 @@ func (instance StoreController) NewController() core.Controller {
 	instance.
 		BindGuard(
 			sharedLayers.AuthGuard{},
-			instance.UPDATE_BY_id_VERSION_1,
 		)
 
 	return instance
@@ -44,9 +43,9 @@ func (instance StoreController) UPDATE_BY_id_VERSION_1(
 
 	store, err := instance.UpdateByID(paramDTO.ID, &Update{
 		Name:        bodyDTO.Data.Name,
-		Description: &bodyDTO.Data.Description,
-		Phone:       &bodyDTO.Data.Phone,
-		Email:       &bodyDTO.Data.Email,
+		Description: bodyDTO.Data.Description,
+		Phone:       bodyDTO.Data.Phone,
+		Email:       bodyDTO.Data.Email,
 	})
 
 	if err != nil {

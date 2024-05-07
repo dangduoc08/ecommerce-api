@@ -15,3 +15,7 @@ var USER_STATUSES = []string{
 	USER_INACTIVE,
 	USER_SUSPENDED,
 }
+
+var (
+	RESET_PASSWORD_SUBJECT = "Đặt Lại Mật Khẩu Shop 5 Châu"
+)

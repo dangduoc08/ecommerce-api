@@ -5,9 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/dangduoc08/ecommerce-api/constants"
 	"github.com/dangduoc08/ecommerce-api/utils"
-	"github.com/dangduoc08/ecommerce-api/validators"
 	"github.com/dangduoc08/gogo/ctx"
 	"github.com/dangduoc08/gogo/modules/config"
 	"github.com/go-playground/validator/v10"
@@ -30,14 +28,6 @@ var ConfModule = config.Register(&config.ConfigModuleOptions{
 
 			// validate config values should be added correctly
 			v := validator.New()
-			v.RegisterValidation("AppENV", validators.ValidateEnum(
-				constants.APP_ENVS,
-				func(err validator.FieldError) {
-					if err != nil {
-						errMsgs = append(errMsgs, fmt.Sprintf("Field: %s, Error: must be %s", err.Field(), err.Tag()))
-					}
-				},
-			))
 
 			err := v.Struct(configDTO)
 			if err != nil {

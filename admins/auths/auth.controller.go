@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/dangduoc08/ecommerce-api/admins/auths/dtos"
+	mailConfigurations "github.com/dangduoc08/ecommerce-api/admins/mail_configurations"
+	"github.com/dangduoc08/ecommerce-api/admins/stores"
 	sharedLayers "github.com/dangduoc08/ecommerce-api/shared_layers"
 
 	"github.com/dangduoc08/ecommerce-api/admins/users"
@@ -24,19 +26,21 @@ type AuthController struct {
 	config.ConfigService
 
 	AuthProvider
-	UserProvider users.UserProvider
+	UserProvider  users.UserProvider
+	StoreProvider stores.StoreProvider
 
-	JWTAccessAPIExpIn    int
-	JWTAccessAPIKey      string
-	JWTRefreshTokenExpIn int
-	JWTRefreshTokenKey   string
+	JWTAccessAPIKey           string
+	JWTAccessAPIExpIn         int
+	JWTRefreshTokenKey        string
+	JWTRefreshTokenExpIn      int
+	MailConfigurationProvider mailConfigurations.MailConfigurationProvider
 }
 
 func (instance AuthController) NewController() core.Controller {
 	instance.
 		BindGuard(
 			AuthGuard{},
-			instance.CREATE_tokens_VERSION_1,
+			instance.MODIFY_refresh_token_VERSION_1,
 		)
 
 	instance.JWTAccessAPIKey = instance.Get("JWT_ACCESS_API_KEY").(string)
@@ -135,7 +139,7 @@ func (instance AuthController) CREATE_sessions_VERSION_1(
 	}
 }
 
-func (instance AuthController) CREATE_tokens_VERSION_1(
+func (instance AuthController) MODIFY_refresh_token_VERSION_1(
 	ctx gogo.Context,
 ) gogo.Map {
 	tokenClaims := ctx.Request.Context().Value(sharedLayers.TokenClaimContextKey("tokenClaims")).(jwt.MapClaims)
@@ -144,7 +148,7 @@ func (instance AuthController) CREATE_tokens_VERSION_1(
 	user, err := instance.UserProvider.FindByID(userID)
 	if err != nil {
 		instance.Error(
-			"CREATE_tokens.FindByID",
+			"MODIFY_refresh_token_VERSION_1.FindByID",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
 		)
@@ -170,8 +174,8 @@ func (instance AuthController) CREATE_tokens_VERSION_1(
 		instance.JWTAccessAPIExpIn,
 	)
 
-	refreshTokenCookie, _ := ctx.Cookie("refresh_token")
-	refreshToken := strings.Replace(refreshTokenCookie.Value, constants.TOKEN_TYPE+" ", "", 1)
+	refreshToken := ctx.Header().Get("refresh_token")
+	refreshToken = strings.Replace(refreshToken, constants.TOKEN_TYPE+" ", "", 1)
 
 	return gogo.Map{
 		"access": gogo.Map{
@@ -192,5 +196,85 @@ func (instance AuthController) CREATE_tokens_VERSION_1(
 			"email":       user.Email,
 			"permissions": permissions,
 		},
+	}
+}
+
+func (instance AuthController) MODIFY_reset_password_VERSION_1(
+	ctx gogo.Context,
+	bodyDTO dtos.MODIFY_reset_password_Body_DTO,
+	headerDTO dtos.MODIFY_reset_password_Header_DTO,
+) gogo.Map {
+	userRec, err := instance.UserProvider.FindOneBy(
+		&users.Query{
+			Username: bodyDTO.Data.UserIdentity,
+		},
+		&users.Query{
+			Email: bodyDTO.Data.UserIdentity,
+		},
+	)
+
+	if err != nil {
+		instance.Error(
+			"MODIFY_reset_password_VERSION_1.UserProvider.FindOneBy",
+			"message", err.Error(),
+			"X-Request-ID", ctx.GetID(),
+		)
+
+		return gogo.Map{
+			"sent": true,
+		}
+	}
+
+	if userRec != nil && userRec.Status != constants.USER_ACTIVE {
+		instance.Error(
+			"MODIFY_reset_password_VERSION_1.UserProvider.FindOneBy",
+			"user_status", userRec.Status,
+			"X-Request-ID", ctx.GetID(),
+		)
+
+		return gogo.Map{
+			"sent": true,
+		}
+	}
+
+	storeRec, err := instance.StoreProvider.FindByID(userRec.StoreID)
+	if err != nil {
+		instance.Error(
+			"MODIFY_reset_password_VERSION_1.StoreProvider.FindByID",
+			"message", err.Error(),
+			"X-Request-ID", ctx.GetID(),
+		)
+
+		return gogo.Map{
+			"sent": true,
+		}
+	}
+
+	mailConfigurationRec, err := instance.MailConfigurationProvider.FindOneBy(
+		&mailConfigurations.Query{
+			StoreID: userRec.StoreID,
+		},
+	)
+	if err != nil {
+		instance.Error(
+			"MODIFY_reset_password_VERSION_1.MailConfigurationProvider.FindOneBy",
+			"message", err.Error(),
+			"X-Request-ID", ctx.GetID(),
+		)
+
+		return gogo.Map{
+			"sent": true,
+		}
+	}
+
+	go instance.SendResetPasswordEmail(
+		headerDTO.Origin,
+		mailConfigurationRec,
+		storeRec,
+		userRec,
+	)
+
+	return gogo.Map{
+		"sent": true,
 	}
 }

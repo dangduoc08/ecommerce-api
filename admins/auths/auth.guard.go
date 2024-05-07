@@ -25,11 +25,11 @@ func (instance AuthGuard) NewGuard() AuthGuard {
 }
 
 func (instance AuthGuard) CanActivate(c gogo.Context) bool {
-	refreshTokenCookie, err := c.Cookie("refresh_token")
-	if err != nil {
+	refreshToken := c.Header().Get("refresh_token")
+	if refreshToken == "" {
 		return false
 	}
-	refreshToken := strings.Replace(refreshTokenCookie.Value, constants.TOKEN_TYPE+" ", "", 1)
+	refreshToken = strings.Replace(refreshToken, constants.TOKEN_TYPE+" ", "", 1)
 	if refreshToken == "" {
 		return false
 	}
