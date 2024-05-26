@@ -8,7 +8,7 @@ import (
 func ValidateEnum(enums []string, cb func(validator.FieldError)) validator.Func {
 	return func(fl validator.FieldLevel) bool {
 		value := fl.Field().String()
-		if value != "" && !utils.ArrIncludes[string](enums, value) {
+		if value != "" && !utils.ArrIncludes(enums, value) {
 			cb(FieldError{
 				fieldLevel: fl,
 				param:      enums,

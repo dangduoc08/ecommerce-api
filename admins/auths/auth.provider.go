@@ -26,18 +26,18 @@ type AuthProvider struct {
 	config.ConfigService
 	common.Logger
 
-	TemplatePath          string
-	MailProvider          mails.MailProvider
-	JWTResetPasswordKey   string
-	JWTResetPasswordExpIn int
+	TemplatePath    string
+	MailProvider    mails.MailProvider
+	JWTRecoverKey   string
+	JWTRecoverExpIn int
 }
 
 func (instance AuthProvider) NewProvider() core.Provider {
 	currentDir, _ := os.Getwd()
 	instance.TemplatePath = filepath.Join(currentDir, constants.TEMPLATE_DIR, "reset_password_email.html")
 
-	instance.JWTResetPasswordKey = instance.Get("JWT_RESET_PASSWORD_KEY").(string)
-	instance.JWTResetPasswordExpIn = instance.Get("JWT_RESET_PASSWORD_EXP_IN").(int)
+	instance.JWTRecoverKey = instance.Get("JWT_RECOVER_KEY").(string)
+	instance.JWTRecoverExpIn = instance.Get("JWT_RECOVER_EXP_IN").(int)
 
 	return instance
 }
@@ -97,8 +97,8 @@ func (instance AuthProvider) SendResetPasswordEmail(
 			"user_id":  user.ID,
 			"store_id": user.StoreID,
 		},
-		instance.JWTResetPasswordKey,
-		instance.JWTResetPasswordExpIn,
+		instance.JWTRecoverKey,
+		instance.JWTRecoverExpIn,
 	)
 	if err != nil {
 		return err
@@ -106,8 +106,9 @@ func (instance AuthProvider) SendResetPasswordEmail(
 
 	query := resetURL.Query()
 	query.Set("token", resetPasswordToken)
+	query.Set("type", constants.TOKEN_TYPE)
 
-	resetURL = resetURL.JoinPath("/password-reset")
+	resetURL = resetURL.JoinPath("/recover")
 	resetURL.RawQuery = query.Encode()
 
 	msgPayload := map[string]string{

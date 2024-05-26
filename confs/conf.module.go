@@ -11,7 +11,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-var Value ConfModel
+var ENV ConfModel
 
 var ConfModule = config.Register(&config.ConfigModuleOptions{
 	IsGlobal:          true,
@@ -23,7 +23,11 @@ var ConfModule = config.Register(&config.ConfigModuleOptions{
 			dto, fieldLevels := c.Transform(ConfModel{})
 
 			configDTO := dto.(ConfModel)
-			Value = configDTO
+
+			if len(configDTO.DomainWhitelist) > 0 {
+				configDTO.DomainWhitelist = strings.Split(configDTO.DomainWhitelist[0], ",")
+			}
+			ENV = configDTO
 			errMsgs := []string{}
 
 			// validate config values should be added correctly

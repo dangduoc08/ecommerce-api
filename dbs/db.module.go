@@ -53,17 +53,17 @@ var DBModule = func(
 ) *core.Module {
 
 	sslmode := "disable"
-	if conf.Value.PostgresSSL {
+	if conf.ENV.PostgresSSL {
 		sslmode = "require"
 	}
 
 	dsn := fmt.Sprintf(
 		"host=%v user=%v password=%v dbname=%v port=%v sslmode=%v TimeZone=Asia/Shanghai",
-		conf.Value.PostgresHost,
-		conf.Value.PostgresUser,
-		conf.Value.PostgresPassword,
-		conf.Value.PostgresDB,
-		conf.Value.PostgresPort,
+		conf.ENV.PostgresHost,
+		conf.ENV.PostgresUser,
+		conf.ENV.PostgresPassword,
+		conf.ENV.PostgresDB,
+		conf.ENV.PostgresPort,
 		sslmode,
 	)
 

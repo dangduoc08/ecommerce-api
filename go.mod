@@ -3,11 +3,11 @@ module github.com/dangduoc08/ecommerce-api
 go 1.22
 
 require (
-	github.com/dangduoc08/gogo v0.0.0-20240504181937-b678ff71f6a4
+	github.com/dangduoc08/gogo v0.0.0-20240526094108-f7521d33b730
 	github.com/go-playground/validator/v10 v10.16.0
 	github.com/golang-jwt/jwt/v5 v5.1.0
 	github.com/nyaruka/phonenumbers v1.2.2
-	golang.org/x/crypto v0.22.0
+	golang.org/x/crypto v0.23.0
 	gorm.io/driver/postgres v1.5.4
 	gorm.io/gorm v1.25.5
 )
@@ -23,9 +23,9 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
-	golang.org/x/net v0.24.0 // indirect
+	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sync v0.5.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 )

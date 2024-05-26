@@ -56,7 +56,7 @@ func (instance AuthGuard) CanActivate(c gogo.Context) bool {
 	})
 
 	if err != nil {
-		panic(exception.UnauthorizedException(err.Error()))
+		panic(exception.UnauthorizedException(utils.Reason(err.Error())))
 	}
 
 	if token.Claims != nil {

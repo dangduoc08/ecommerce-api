@@ -9,21 +9,20 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type CREATE_sessions_Body_Data_DTO struct {
-	Username string `bind:"username" validate:"required,gte=6"`
+type MODIFY_recover_Body_Data_DTO struct {
 	Password string `bind:"password" validate:"required,password"`
 }
 
-type CREATE_sessions_Body_DTO struct {
-	Data CREATE_sessions_Body_Data_DTO `bind:"data"`
+type MODIFY_recover_Body_DTO struct {
+	Data MODIFY_recover_Body_Data_DTO `bind:"data"`
 }
 
-func (instance CREATE_sessions_Body_DTO) Transform(body gogo.Body, medata common.ArgumentMetadata) any {
+func (instance MODIFY_recover_Body_DTO) Transform(body gogo.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
 	bindedStruct, fls := body.Bind(instance)
-	bodyDTO := bindedStruct.(CREATE_sessions_Body_DTO)
+	bodyDTO := bindedStruct.(MODIFY_recover_Body_DTO)
 
 	fieldMap := make(map[string]gogo.FieldLevel)
 	for _, fl := range fls {

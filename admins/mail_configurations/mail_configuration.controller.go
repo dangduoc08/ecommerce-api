@@ -29,21 +29,21 @@ func (instance MailConfigurationController) NewController() core.Controller {
 func (instance MailConfigurationController) READ_VERSION_1(
 	ctx gogo.Context,
 	tokenClaimsDTO sharedLayers.TokenClaimsDTO,
-) *MailConfigurationModel {
-	mailConfigurationRec, err := instance.FindOneBy(&Query{
+) []*MailConfigurationModel {
+	mailConfigurationRecs, err := instance.FindManyBy(20, 0, &Query{
 		StoreID: tokenClaimsDTO.StoreID,
 	})
 
 	if err != nil {
 		instance.Debug(
-			"MailConfigurationController.READ_BY_id_VERSION_1.FindOneBy",
+			"MailConfigurationController.READ_VERSION_1.FindManyBy",
 			"error", err.Error(),
 			"X-Request-ID", ctx.GetID(),
 		)
 		return nil
 	}
 
-	return mailConfigurationRec
+	return mailConfigurationRecs
 }
 
 func (instance MailConfigurationController) UPDATE_BY_id_VERSION_1(

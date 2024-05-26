@@ -1,12 +1,12 @@
 package dtos
 
 import (
-	"fmt"
-	"strings"
-
+	"github.com/dangduoc08/ecommerce-api/utils"
+	"github.com/dangduoc08/ecommerce-api/validators"
 	"github.com/dangduoc08/gogo"
 	"github.com/dangduoc08/gogo/common"
 	"github.com/dangduoc08/gogo/exception"
+	"github.com/dangduoc08/gogo/modules/config"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -35,8 +35,12 @@ func (instance MODIFY_reset_password_Body_DTO) Transform(body gogo.Body, medata 
 		for _, fieldErr := range fieldErrs.(validator.ValidationErrors) {
 			fl := fieldMap[fieldErr.Field()]
 			errMsgs = append(errMsgs, map[string]any{
-				"field": fl.NestedTag(),
-				"error": strings.TrimSpace(fmt.Sprintf("must be %v %v", fieldErr.Tag(), fieldErr.Param())),
+				"field":     fl.Tag(),
+				"namespace": fl.NestedTag(),
+				"reason": utils.Reason(
+					"mustBe",
+					fieldErr.Tag(),
+				),
 			})
 		}
 	}
@@ -49,10 +53,13 @@ func (instance MODIFY_reset_password_Body_DTO) Transform(body gogo.Body, medata 
 }
 
 type MODIFY_reset_password_Header_DTO struct {
-	Origin string `bind:"Origin" validate:"required"`
+	config.ConfigService
+	Origin string `bind:"Origin" validate:"required,cors"`
 }
 
 func (instance MODIFY_reset_password_Header_DTO) Transform(header gogo.Header, medata common.ArgumentMetadata) any {
+	domainWhitelist := instance.Get("DOMAIN_WHITELIST").([]string)
+
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
@@ -64,13 +71,33 @@ func (instance MODIFY_reset_password_Header_DTO) Transform(header gogo.Header, m
 		fieldMap[fl.Field()] = fl
 	}
 
+	validate.RegisterValidation("cors", validators.ValidateEnum(domainWhitelist, func(fieldErr validator.FieldError) {
+		if fieldErr != nil {
+			fl := fieldMap[fieldErr.Field()]
+			errMsgs = append(errMsgs, map[string]any{
+				"field":     fl.Tag(),
+				"namespace": fl.NestedTag(),
+				"reason": utils.Reason(
+					"domain",
+					fieldErr.Value().(string),
+					"nin",
+					"availableList",
+				),
+			})
+		}
+	}))
+
 	fieldErrs := validate.Struct(headerDTO)
 	if fieldErrs != nil {
 		for _, fieldErr := range fieldErrs.(validator.ValidationErrors) {
 			fl := fieldMap[fieldErr.Field()]
 			errMsgs = append(errMsgs, map[string]any{
-				"field": fl.NestedTag(),
-				"error": strings.TrimSpace(fmt.Sprintf("must be %v %v", fieldErr.Tag(), fieldErr.Param())),
+				"field":     fl.Tag(),
+				"namespace": fl.NestedTag(),
+				"reason": utils.Reason(
+					"mustBe",
+					fieldErr.Tag(),
+				),
 			})
 		}
 	}

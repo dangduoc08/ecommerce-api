@@ -15,30 +15,41 @@ import (
 
 type AuthGuard struct {
 	config.ConfigService
-	JWTRefreshTokenAPIKey string
 }
 
 func (instance AuthGuard) NewGuard() AuthGuard {
-	instance.JWTRefreshTokenAPIKey = instance.Get("JWT_REFRESH_TOKEN_KEY").(string)
-
 	return instance
 }
 
 func (instance AuthGuard) CanActivate(c gogo.Context) bool {
-	refreshToken := c.Header().Get("refresh_token")
-	if refreshToken == "" {
-		return false
-	}
-	refreshToken = strings.Replace(refreshToken, constants.TOKEN_TYPE+" ", "", 1)
-	if refreshToken == "" {
+	headerKey := ""
+	tokenKey := ""
+
+	switch c.URL.Path {
+	case "/admins/auths/recover":
+		headerKey = "recover_token"
+		tokenKey = instance.Get("JWT_RECOVER_KEY").(string)
+	case "/admins/auths/refresh_token":
+		headerKey = "refresh_token"
+		tokenKey = instance.Get("JWT_REFRESH_TOKEN_KEY").(string)
+	default:
 		return false
 	}
 
-	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (any, error) {
+	jwtToken := c.Header().Get(headerKey)
+	if jwtToken == "" {
+		return false
+	}
+	jwtToken = strings.Replace(jwtToken, constants.TOKEN_TYPE+" ", "", 1)
+	if jwtToken == "" {
+		return false
+	}
+
+	token, err := jwt.Parse(jwtToken, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(instance.JWTRefreshTokenAPIKey), nil
+		return []byte(tokenKey), nil
 	})
 
 	if err != nil {
