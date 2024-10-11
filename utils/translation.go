@@ -13,7 +13,7 @@ var vi = map[string]string{
 	"in":               "nằm trong",
 	"nin":              "không nằm trong",
 	"passwordError":    "phải có ít nhất 8 ký tự, bao gồm ít nhất 1 chữ in hoa, 1 chữ số và 1 ký tự đặc biệt",
-	"mustBe":           "phải",
+	"mustBe":           "phải là",
 	"characters":       "kí tự",
 	"required":         "bắt buộc nhập",
 	"record not found": "không tìm thấy dữ liệu",
@@ -26,6 +26,7 @@ var vi = map[string]string{
 	"domain":        "tên miền",
 	"availableList": "danh sách khả dụng",
 	"Access denied": "từ chối truy cập",
+	"fqdn":          "tên miền hợp lệ",
 }
 
 var en = map[string]string{
@@ -49,6 +50,7 @@ var en = map[string]string{
 	"domain":        "domain",
 	"availableList": "available list",
 	"Access denied": "access denied",
+	"fqdn":          "valid domain",
 }
 
 var Translation = map[string]map[string]string{

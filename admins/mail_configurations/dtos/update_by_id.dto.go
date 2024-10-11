@@ -1,7 +1,6 @@
 package dtos
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/dangduoc08/gogo"
@@ -31,8 +30,13 @@ func (instance UPDATE_BY_id_Param_DTO) Transform(param gogo.Param, medata common
 		for _, fieldErr := range fieldErrs.(validator.ValidationErrors) {
 			fl := fieldMap[fieldErr.Field()]
 			errMsgs = append(errMsgs, map[string]any{
-				"field": fl.NestedTag(),
-				"error": strings.TrimSpace(fmt.Sprintf("must be %v %v", fieldErr.Tag(), fieldErr.Param())),
+				"field":     fl.Tag(),
+				"namespace": fl.NestedTag(),
+				"reason": []string{
+					"mustBe",
+					fieldErr.Tag(),
+					fieldErr.Param(),
+				},
 			})
 		}
 	}
@@ -76,8 +80,13 @@ func (instance UPDATE_BY_id_Body_DTO) Transform(body gogo.Body, medata common.Ar
 		for _, fieldErr := range fieldErrs.(validator.ValidationErrors) {
 			fl := fieldMap[fieldErr.Field()]
 			errMsgs = append(errMsgs, map[string]any{
-				"field": fl.NestedTag(),
-				"error": strings.TrimSpace(fmt.Sprintf("must be %v %v", fieldErr.Tag(), fieldErr.Param())),
+				"field":     fl.Tag(),
+				"namespace": fl.NestedTag(),
+				"reason": []string{
+					"mustBe",
+					fieldErr.Tag(),
+					fieldErr.Param(),
+				},
 			})
 		}
 	}

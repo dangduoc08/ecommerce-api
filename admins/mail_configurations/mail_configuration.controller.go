@@ -30,7 +30,7 @@ func (instance MailConfigurationController) READ_VERSION_1(
 	ctx gogo.Context,
 	tokenClaimsDTO sharedLayers.TokenClaimsDTO,
 ) []*MailConfigurationModel {
-	mailConfigurationRecs, err := instance.FindManyBy(20, 0, &Query{
+	mailConfigurationRecs, err := instance.FindManyBy(1, 0, &Query{
 		StoreID: tokenClaimsDTO.StoreID,
 	})
 
@@ -61,7 +61,9 @@ func (instance MailConfigurationController) UPDATE_BY_id_VERSION_1(
 			"error", err.Error(),
 			"X-Request-ID", ctx.GetID(),
 		)
-		panic(exception.UnprocessableEntityException(err.Error()))
+		panic(exception.UnprocessableEntityException(err.Error(), exception.ExceptionOptions{
+			Cause: err,
+		}))
 	}
 
 	mailConfigurationRec, err := instance.UpdateByID(paramDTO.ID, &Update{
@@ -77,7 +79,9 @@ func (instance MailConfigurationController) UPDATE_BY_id_VERSION_1(
 			"error", err.Error(),
 			"X-Request-ID", ctx.GetID(),
 		)
-		panic(exception.UnprocessableEntityException(err.Error()))
+		panic(exception.UnprocessableEntityException(err.Error(), exception.ExceptionOptions{
+			Cause: err,
+		}))
 	}
 
 	return mailConfigurationRec

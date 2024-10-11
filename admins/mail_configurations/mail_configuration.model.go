@@ -5,7 +5,7 @@ import "time"
 type MailConfigurationModel struct {
 	ID        uint      `json:"id" gorm:"primaryKey"`
 	Host      string    `json:"host"`
-	Port      int       `json:"post"`
+	Port      int       `json:"port"`
 	Username  string    `json:"username"`
 	Password  string    `json:"password"`
 	StoreID   uint      `json:"-" gorm:"not null"`
@@ -18,8 +18,6 @@ type Query struct {
 	StoreID uint
 	Sort    string
 	Order   string
-	Limit   int
-	Offset  int
 }
 
 type Update struct {
