@@ -21,9 +21,11 @@ var vi = map[string]string{
 	"active":           "hoạt động",
 	"inactive":         "không hoạt động",
 	"suspended":        "bị cấm",
-	"token has invalid claims: token is expired": "token không hợp lệ",
+	"token has invalid claims: token is expired":       "token không hợp lệ",
+	"token signature is invalid: signature is invalid": "token không hợp lệ",
 	"domain":        "tên miền",
 	"availableList": "danh sách khả dụng",
+	"Access denied": "từ chối truy cập",
 }
 
 var en = map[string]string{
@@ -42,20 +44,22 @@ var en = map[string]string{
 	"active":           "active",
 	"inactive":         "inactive",
 	"suspended":        "suspended",
-	"token has invalid claims: token is expired": "token is invalid",
+	"token has invalid claims: token is expired":       "token is invalid",
+	"token signature is invalid: signature is invalid": "token is invalid",
 	"domain":        "domain",
 	"availableList": "available list",
+	"Access denied": "access denied",
 }
 
-var translation = map[string]map[string]string{
+var Translation = map[string]map[string]string{
 	"en_US": en,
 	"vi_VN": vi,
 }
 
 func translate(k string, locale string) string {
 	trm := map[string]string{}
-	if len(locale) > 0 && translation[locale] != nil {
-		trm = translation[locale]
+	if len(locale) > 0 && Translation[locale] != nil {
+		trm = Translation[locale]
 	}
 
 	if v, ok := trm[k]; ok {
@@ -64,13 +68,13 @@ func translate(k string, locale string) string {
 	return k
 }
 
-func Reason(reasons ...string) string {
+func Reason(locale string, reasons ...string) string {
 	reason := ""
 	for _, eachReason := range reasons {
 		if eachReason == "" {
 			break
 		}
-		reason += translate(eachReason, "vi_VN") + " "
+		reason += translate(eachReason, locale) + " "
 	}
 
 	reason = strings.TrimSpace(reason)

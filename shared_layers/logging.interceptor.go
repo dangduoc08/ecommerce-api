@@ -80,17 +80,17 @@ func (instance LoggingInterceptor) Intercept(c gogo.Context, aggregation gogo.Ag
 			return data
 		}),
 		aggregation.Error(func(c gogo.Context, err any) any {
-			if httpException, ok := err.(exception.HTTPException); ok {
+			if exception, ok := err.(exception.Exception); ok {
 				instance.Logger.Debug(
 					"ErrorResponse",
-					"data", err,
-					"message", httpException.GetResponse(),
+					"data", exception,
+					"message", exception.GetResponse(),
 					"X-Request-ID", c.GetID(),
 				)
 			} else {
 				instance.Logger.Debug(
 					"ErrorResponse",
-					"data", err,
+					"data", exception,
 					"X-Request-ID", c.GetID(),
 				)
 			}

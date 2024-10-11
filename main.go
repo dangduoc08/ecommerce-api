@@ -28,18 +28,32 @@ func main() {
 		EnableVersioning(
 			versioning.Versioning{
 				Type:           versioning.HEADER,
-				Key:            "v",
 				DefaultVersion: versioning.NEUTRAL_VERSION,
+				Key:            "v",
 			},
 		).
 		UseLogger(logger).
 		Use(
-			middlewares.CORS(),
 			middlewares.RequestLogger(logger),
+			middlewares.CORS(&middlewares.CORSOptions{
+				AllowOrigin:        confs.ENV.DomainWhitelist,
+				IsAllowCredentials: true,
+				AllowHeaders: []string{
+					"Origin",
+					"X-Requested-With",
+					"Content-Type",
+					"Accept",
+					"v",
+					"Cookie",
+				},
+			}),
 		).
 		BindGlobalInterceptors(
 			sharedLayers.LoggingInterceptor{},
 			sharedLayers.ResponseInterceptor{},
+		).
+		BindGlobalExceptionFilters(
+			sharedLayers.AllExceptionsFilter{},
 		)
 
 	app.Create(

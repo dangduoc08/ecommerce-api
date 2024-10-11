@@ -1,7 +1,6 @@
 package dtos
 
 import (
-	"github.com/dangduoc08/ecommerce-api/utils"
 	"github.com/dangduoc08/ecommerce-api/validators"
 	"github.com/dangduoc08/gogo"
 	"github.com/dangduoc08/gogo/common"
@@ -9,20 +8,21 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type MODIFY_recover_Body_Data_DTO struct {
+type CREATE_signin_VERSION_1_Body_Data_DTO struct {
+	Username string `bind:"username" validate:"required,gte=6"`
 	Password string `bind:"password" validate:"required,password"`
 }
 
-type MODIFY_recover_Body_DTO struct {
-	Data MODIFY_recover_Body_Data_DTO `bind:"data"`
+type CREATE_signin_VERSION_1_Body_DTO struct {
+	Data CREATE_signin_VERSION_1_Body_Data_DTO `bind:"data"`
 }
 
-func (instance MODIFY_recover_Body_DTO) Transform(body gogo.Body, medata common.ArgumentMetadata) any {
+func (instance CREATE_signin_VERSION_1_Body_DTO) Transform(body gogo.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
 	bindedStruct, fls := body.Bind(instance)
-	bodyDTO := bindedStruct.(MODIFY_recover_Body_DTO)
+	bodyDTO := bindedStruct.(CREATE_signin_VERSION_1_Body_DTO)
 
 	fieldMap := make(map[string]gogo.FieldLevel)
 	for _, fl := range fls {
@@ -35,9 +35,9 @@ func (instance MODIFY_recover_Body_DTO) Transform(body gogo.Body, medata common.
 			errMsgs = append(errMsgs, map[string]any{
 				"field":     fl.Tag(),
 				"namespace": fl.NestedTag(),
-				"reason": utils.Reason(
+				"reason": []string{
 					"passwordError",
-				),
+				},
 			})
 		}
 	}))
@@ -49,12 +49,12 @@ func (instance MODIFY_recover_Body_DTO) Transform(body gogo.Body, medata common.
 			errMsgs = append(errMsgs, map[string]any{
 				"field":     fl.Tag(),
 				"namespace": fl.NestedTag(),
-				"reason": utils.Reason(
+				"reason": []string{
 					"mustBe",
 					fieldErr.Tag(),
 					fieldErr.Param(),
 					"characters",
-				),
+				},
 			})
 		}
 	}

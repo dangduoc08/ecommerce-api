@@ -7,7 +7,6 @@ import (
 	mailConfigurations "github.com/dangduoc08/ecommerce-api/admins/mail_configurations"
 	"github.com/dangduoc08/ecommerce-api/admins/stores"
 	sharedLayers "github.com/dangduoc08/ecommerce-api/shared_layers"
-	"github.com/dangduoc08/ecommerce-api/utils"
 
 	"github.com/dangduoc08/ecommerce-api/admins/users"
 	"github.com/dangduoc08/ecommerce-api/constants"
@@ -45,7 +44,7 @@ func (instance AuthController) NewController() core.Controller {
 	instance.
 		BindGuard(
 			AuthGuard{},
-			instance.MODIFY_refresh_token_VERSION_1,
+			instance.CREATE_refresh_token_VERSION_1,
 			instance.MODIFY_recover_VERSION_1,
 		)
 
@@ -58,9 +57,9 @@ func (instance AuthController) NewController() core.Controller {
 	return instance
 }
 
-func (instance AuthController) CREATE_sessions_VERSION_1(
+func (instance AuthController) CREATE_signin_VERSION_1(
 	ctx gogo.Context,
-	bodyDTO dtos.CREATE_sessions_Body_DTO,
+	bodyDTO dtos.CREATE_signin_VERSION_1_Body_DTO,
 ) gogo.Map {
 	user, err := instance.UserProvider.FindOneBy(&users.Query{
 		Username: bodyDTO.Data.Username,
@@ -68,20 +67,26 @@ func (instance AuthController) CREATE_sessions_VERSION_1(
 
 	if err != nil {
 		instance.Error(
-			"CREATE_sessions.FindOneBy",
+			"CREATE_signin_VERSION_1.FindOneBy",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
 		)
-		panic(exception.NotFoundException(utils.Reason(err.Error())))
+
+		panic(exception.NotFoundException(
+			err.Error(),
+			exception.ExceptionOptions{
+				Cause: err,
+			},
+		))
 	}
 
 	// check user should be active
 	if user.Status != users.UserStatus(constants.USER_ACTIVE) {
-		panic(exception.UnauthorizedException(utils.Reason("user's status is", string(user.Status))))
+		panic(exception.UnauthorizedException([]string{"user's status is", string(user.Status)}))
 	}
 
 	if !instance.CheckHash(bodyDTO.Data.Password, user.Hash) {
-		panic(exception.UnauthorizedException(utils.Reason("record not found")))
+		panic(exception.UnauthorizedException("record not found"))
 	}
 
 	permissions := instance.GetUserPermissions(user.Groups)
@@ -129,16 +134,18 @@ func (instance AuthController) CREATE_sessions_VERSION_1(
 			"type":  constants.TOKEN_TYPE,
 			"exp":   instance.JWTAccessAPIExpIn,
 			"token": accessToken,
+			"name":  constants.ACCESS_TOKEN_NAME,
 		},
 		"refresh": gogo.Map{
 			"type":  constants.TOKEN_TYPE,
 			"exp":   instance.JWTRefreshTokenExpIn,
 			"token": refreshToken,
+			"name":  constants.REFRESH_TOKEN_NAME,
 		},
 	}
 }
 
-func (instance AuthController) MODIFY_refresh_token_VERSION_1(
+func (instance AuthController) CREATE_refresh_token_VERSION_1(
 	ctx gogo.Context,
 ) gogo.Map {
 	tokenClaims := ctx.Request.Context().Value(sharedLayers.TokenClaimContextKey("tokenClaims")).(jwt.MapClaims)
@@ -147,15 +154,15 @@ func (instance AuthController) MODIFY_refresh_token_VERSION_1(
 	user, err := instance.UserProvider.FindByID(userID)
 	if err != nil {
 		instance.Error(
-			"MODIFY_refresh_token_VERSION_1.FindByID",
+			"CREATE_refresh_token_VERSION_1.FindByID",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
 		)
-		panic(exception.NotFoundException(utils.Reason(err.Error())))
+		panic(exception.NotFoundException(err.Error()))
 	}
 
 	if user.Status != users.UserStatus(constants.USER_ACTIVE) {
-		panic(exception.UnauthorizedException(utils.Reason("user's status is", string(user.Status))))
+		panic(exception.UnauthorizedException([]string{"user's status is", string(user.Status)}))
 	}
 
 	permissions := instance.GetUserPermissions(user.Groups)
@@ -178,14 +185,15 @@ func (instance AuthController) MODIFY_refresh_token_VERSION_1(
 			"type":  constants.TOKEN_TYPE,
 			"exp":   instance.JWTAccessAPIExpIn,
 			"token": accessToken,
+			"name":  constants.ACCESS_TOKEN_NAME,
 		},
 	}
 }
 
-func (instance AuthController) MODIFY_request_password_reset_VERSION_1(
+func (instance AuthController) CREATE_request_password_reset_VERSION_1(
 	ctx gogo.Context,
-	bodyDTO dtos.MODIFY_reset_password_Body_DTO,
-	headerDTO dtos.MODIFY_reset_password_Header_DTO,
+	bodyDTO dtos.CREATE_reset_password_VERSION_1_Body_DTO,
+	headerDTO dtos.CREATE_reset_password_VERSION_1_Header_DTO,
 ) gogo.Map {
 	userRec, err := instance.UserProvider.FindOneBy(
 		&users.Query{
@@ -198,7 +206,7 @@ func (instance AuthController) MODIFY_request_password_reset_VERSION_1(
 
 	if err != nil {
 		instance.Error(
-			"MODIFY_request_password_reset_VERSION_1.UserProvider.FindOneBy",
+			"CREATE_request_password_reset_VERSION_1.UserProvider.FindOneBy",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
 		)
@@ -210,7 +218,7 @@ func (instance AuthController) MODIFY_request_password_reset_VERSION_1(
 
 	if userRec != nil && userRec.Status != constants.USER_ACTIVE {
 		instance.Error(
-			"MODIFY_request_password_reset_VERSION_1.UserProvider.FindOneBy",
+			"CREATE_request_password_reset_VERSION_1.UserProvider.FindOneBy",
 			"user_status", userRec.Status,
 			"X-Request-ID", ctx.GetID(),
 		)
@@ -223,7 +231,7 @@ func (instance AuthController) MODIFY_request_password_reset_VERSION_1(
 	storeRec, err := instance.StoreProvider.FindByID(userRec.StoreID)
 	if err != nil {
 		instance.Error(
-			"MODIFY_request_password_reset_VERSION_1.StoreProvider.FindByID",
+			"CREATE_request_password_reset_VERSION_1.StoreProvider.FindByID",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
 		)
@@ -240,7 +248,7 @@ func (instance AuthController) MODIFY_request_password_reset_VERSION_1(
 	)
 	if err != nil {
 		instance.Error(
-			"MODIFY_request_password_reset_VERSION_1.MailConfigurationProvider.FindOneBy",
+			"CREATE_request_password_reset_VERSION_1.MailConfigurationProvider.FindOneBy",
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
 		)
@@ -264,7 +272,7 @@ func (instance AuthController) MODIFY_request_password_reset_VERSION_1(
 
 func (instance AuthController) MODIFY_recover_VERSION_1(
 	ctx gogo.Context,
-	bodyDTO dtos.MODIFY_recover_Body_DTO,
+	bodyDTO dtos.MODIFY_recover_VERSION_1_Body_DTO,
 ) (int, gogo.Map) {
 	tokenClaims := ctx.Request.Context().Value(sharedLayers.TokenClaimContextKey("tokenClaims")).(jwt.MapClaims)
 	userID := uint(tokenClaims["user_id"].(float64))
@@ -276,11 +284,14 @@ func (instance AuthController) MODIFY_recover_VERSION_1(
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
 		)
-		panic(exception.NotFoundException(utils.Reason(err.Error())))
+		panic(exception.NotFoundException(err.Error()))
 	}
 
 	if user.Status != users.UserStatus(constants.USER_ACTIVE) {
-		panic(exception.UnauthorizedException(utils.Reason("user's status is", string(user.Status))))
+		panic(exception.UnauthorizedException([]string{
+			"user's status is",
+			string(user.Status),
+		}))
 	}
 
 	user.Hash, err = instance.HashPassword(bodyDTO.Data.Password)
@@ -290,7 +301,7 @@ func (instance AuthController) MODIFY_recover_VERSION_1(
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
 		)
-		panic(exception.InternalServerErrorException(utils.Reason(err.Error())))
+		panic(exception.InternalServerErrorException(err.Error()))
 	}
 
 	instance.UserProvider.ModifyOne(user)
@@ -311,11 +322,11 @@ func (instance AuthController) READ_me_VERSION_1(ctx gogo.Context) *users.UserMo
 			"message", err.Error(),
 			"X-Request-ID", ctx.GetID(),
 		)
-		panic(exception.NotFoundException(utils.Reason(err.Error())))
+		panic(exception.NotFoundException(err.Error()))
 	}
 
 	if user.Status != users.UserStatus(constants.USER_ACTIVE) {
-		panic(exception.UnauthorizedException(utils.Reason("user's status is", string(user.Status))))
+		panic(exception.UnauthorizedException([]string{"user's status is", string(user.Status)}))
 	}
 
 	return user

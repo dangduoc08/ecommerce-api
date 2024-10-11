@@ -39,7 +39,7 @@ func (instance AuthGuard) checkPermission(accessTo string, permissions []any) bo
 }
 
 func (instance AuthGuard) CanActivate(c gogo.Context) bool {
-	accessTokenCookie, err := c.Cookie("access_token")
+	accessTokenCookie, err := c.Cookie(constants.ACCESS_TOKEN_NAME)
 	if err != nil {
 		return false
 	}
@@ -56,7 +56,9 @@ func (instance AuthGuard) CanActivate(c gogo.Context) bool {
 	})
 
 	if err != nil {
-		panic(exception.UnauthorizedException(utils.Reason(err.Error())))
+		panic(exception.UnauthorizedException(err.Error(), exception.ExceptionOptions{
+			Cause: err,
+		}))
 	}
 
 	if token.Claims != nil {

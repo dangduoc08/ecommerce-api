@@ -1,7 +1,6 @@
 package dtos
 
 import (
-	"github.com/dangduoc08/ecommerce-api/utils"
 	"github.com/dangduoc08/ecommerce-api/validators"
 	"github.com/dangduoc08/gogo"
 	"github.com/dangduoc08/gogo/common"
@@ -10,20 +9,20 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type MODIFY_reset_password_Body_Data_DTO struct {
+type CREATE_reset_password_VERSION_1_Body_Data_DTO struct {
 	UserIdentity string `bind:"user_identity" validate:"required"`
 }
 
-type MODIFY_reset_password_Body_DTO struct {
-	Data MODIFY_reset_password_Body_Data_DTO `bind:"data"`
+type CREATE_reset_password_VERSION_1_Body_DTO struct {
+	Data CREATE_reset_password_VERSION_1_Body_Data_DTO `bind:"data"`
 }
 
-func (instance MODIFY_reset_password_Body_DTO) Transform(body gogo.Body, medata common.ArgumentMetadata) any {
+func (instance CREATE_reset_password_VERSION_1_Body_DTO) Transform(body gogo.Body, medata common.ArgumentMetadata) any {
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
 	bindedStruct, fls := body.Bind(instance)
-	bodyDTO := bindedStruct.(MODIFY_reset_password_Body_DTO)
+	bodyDTO := bindedStruct.(CREATE_reset_password_VERSION_1_Body_DTO)
 
 	fieldMap := make(map[string]gogo.FieldLevel)
 	for _, fl := range fls {
@@ -37,10 +36,10 @@ func (instance MODIFY_reset_password_Body_DTO) Transform(body gogo.Body, medata 
 			errMsgs = append(errMsgs, map[string]any{
 				"field":     fl.Tag(),
 				"namespace": fl.NestedTag(),
-				"reason": utils.Reason(
+				"reason": []string{
 					"mustBe",
 					fieldErr.Tag(),
-				),
+				},
 			})
 		}
 	}
@@ -52,19 +51,19 @@ func (instance MODIFY_reset_password_Body_DTO) Transform(body gogo.Body, medata 
 	return bodyDTO
 }
 
-type MODIFY_reset_password_Header_DTO struct {
+type CREATE_reset_password_VERSION_1_Header_DTO struct {
 	config.ConfigService
 	Origin string `bind:"Origin" validate:"required,cors"`
 }
 
-func (instance MODIFY_reset_password_Header_DTO) Transform(header gogo.Header, medata common.ArgumentMetadata) any {
+func (instance CREATE_reset_password_VERSION_1_Header_DTO) Transform(header gogo.Header, medata common.ArgumentMetadata) any {
 	domainWhitelist := instance.Get("DOMAIN_WHITELIST").([]string)
 
 	errMsgs := []map[string]any{}
 
 	validate := validator.New()
 	bindedStruct, fls := header.Bind(instance)
-	headerDTO := bindedStruct.(MODIFY_reset_password_Header_DTO)
+	headerDTO := bindedStruct.(CREATE_reset_password_VERSION_1_Header_DTO)
 
 	fieldMap := make(map[string]gogo.FieldLevel)
 	for _, fl := range fls {
@@ -77,12 +76,12 @@ func (instance MODIFY_reset_password_Header_DTO) Transform(header gogo.Header, m
 			errMsgs = append(errMsgs, map[string]any{
 				"field":     fl.Tag(),
 				"namespace": fl.NestedTag(),
-				"reason": utils.Reason(
+				"reason": []string{
 					"domain",
 					fieldErr.Value().(string),
 					"nin",
 					"availableList",
-				),
+				},
 			})
 		}
 	}))
@@ -94,10 +93,10 @@ func (instance MODIFY_reset_password_Header_DTO) Transform(header gogo.Header, m
 			errMsgs = append(errMsgs, map[string]any{
 				"field":     fl.Tag(),
 				"namespace": fl.NestedTag(),
-				"reason": utils.Reason(
+				"reason": []string{
 					"mustBe",
 					fieldErr.Tag(),
-				),
+				},
 			})
 		}
 	}

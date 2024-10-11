@@ -27,10 +27,10 @@ func (instance AuthGuard) CanActivate(c gogo.Context) bool {
 
 	switch c.URL.Path {
 	case "/admins/auths/recover":
-		headerKey = "recover_token"
+		headerKey = constants.RECOVER_TOKEN_NAME
 		tokenKey = instance.Get("JWT_RECOVER_KEY").(string)
 	case "/admins/auths/refresh_token":
-		headerKey = "refresh_token"
+		headerKey = constants.REFRESH_TOKEN_NAME
 		tokenKey = instance.Get("JWT_REFRESH_TOKEN_KEY").(string)
 	default:
 		return false
