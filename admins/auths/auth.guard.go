@@ -22,30 +22,32 @@ func (instance AuthGuard) NewGuard() AuthGuard {
 }
 
 func (instance AuthGuard) CanActivate(c gogo.Context) bool {
-	headerKey := ""
 	tokenKey := ""
+	tokenValue := ""
 
 	switch c.URL.Path {
 	case "/admins/auths/recover":
-		headerKey = constants.RECOVER_TOKEN_NAME
 		tokenKey = instance.Get("JWT_RECOVER_KEY").(string)
+		tokenValue = c.Header().Get(constants.RECOVER_TOKEN_NAME)
 	case "/admins/auths/refresh_token":
-		headerKey = constants.REFRESH_TOKEN_NAME
 		tokenKey = instance.Get("JWT_REFRESH_TOKEN_KEY").(string)
+		refreshTokenCookie, _ := c.Cookie(constants.REFRESH_TOKEN_NAME)
+		if refreshTokenCookie != nil {
+			tokenValue = refreshTokenCookie.Value
+		}
 	default:
 		return false
 	}
 
-	jwtToken := c.Header().Get(headerKey)
-	if jwtToken == "" {
+	if tokenValue == "" {
 		return false
 	}
-	jwtToken = strings.Replace(jwtToken, constants.TOKEN_TYPE+" ", "", 1)
-	if jwtToken == "" {
+	tokenValue = strings.Replace(tokenValue, constants.TOKEN_TYPE+" ", "", 1)
+	if tokenValue == "" {
 		return false
 	}
 
-	token, err := jwt.Parse(jwtToken, func(token *jwt.Token) (any, error) {
+	token, err := jwt.Parse(tokenValue, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}

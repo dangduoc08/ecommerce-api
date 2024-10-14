@@ -105,8 +105,9 @@ func (instance AuthProvider) SendResetPasswordEmail(
 	}
 
 	query := resetURL.Query()
-	query.Set("token", resetPasswordToken)
+	query.Set("name", constants.RECOVER_TOKEN_NAME)
 	query.Set("type", constants.TOKEN_TYPE)
+	query.Set("token", resetPasswordToken)
 
 	resetURL = resetURL.JoinPath("/recover")
 	resetURL.RawQuery = query.Encode()

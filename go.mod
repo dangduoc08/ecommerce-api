@@ -3,7 +3,7 @@ module github.com/dangduoc08/ecommerce-api
 go 1.22
 
 require (
-	github.com/dangduoc08/gogo v0.0.0-20241011084909-64294cf681ac
+	github.com/dangduoc08/gogo v0.0.0-20241012101013-4213e6c63a82
 	github.com/go-playground/validator/v10 v10.16.0
 	github.com/golang-jwt/jwt/v5 v5.1.0
 	github.com/nyaruka/phonenumbers v1.2.2

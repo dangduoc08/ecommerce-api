@@ -29,7 +29,7 @@ func main() {
 			versioning.Versioning{
 				Type:           versioning.HEADER,
 				DefaultVersion: versioning.NEUTRAL_VERSION,
-				Key:            "v",
+				Key:            "X-Api-Version",
 			},
 		).
 		UseLogger(logger).

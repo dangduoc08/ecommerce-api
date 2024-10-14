@@ -18,6 +18,10 @@ github.com/dangduoc08/gogo v0.0.0-20241010193938-7de15a25363d h1:a54O9AovJ5Q/qmw
 github.com/dangduoc08/gogo v0.0.0-20241010193938-7de15a25363d/go.mod h1:8CDeeU9h+1BE4zFWOxRW7qWno0B/xqIKGKiyGT0ARSw=
 github.com/dangduoc08/gogo v0.0.0-20241011084909-64294cf681ac h1:XSmVyIwW2/QpLtKQpRdROCPH/RY/4Um8h55gJszEXxc=
 github.com/dangduoc08/gogo v0.0.0-20241011084909-64294cf681ac/go.mod h1:8CDeeU9h+1BE4zFWOxRW7qWno0B/xqIKGKiyGT0ARSw=
+github.com/dangduoc08/gogo v0.0.0-20241011095420-37af0919be26 h1:XN+ozCHlHE6I2stOvd2zTs/NUee+b2hWIVB1RwsQAoo=
+github.com/dangduoc08/gogo v0.0.0-20241011095420-37af0919be26/go.mod h1:8CDeeU9h+1BE4zFWOxRW7qWno0B/xqIKGKiyGT0ARSw=
+github.com/dangduoc08/gogo v0.0.0-20241012101013-4213e6c63a82 h1:dGtXl4VpuZWm3/999xRk4xBbduFpIseTX3kVgjerMao=
+github.com/dangduoc08/gogo v0.0.0-20241012101013-4213e6c63a82/go.mod h1:8CDeeU9h+1BE4zFWOxRW7qWno0B/xqIKGKiyGT0ARSw=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
